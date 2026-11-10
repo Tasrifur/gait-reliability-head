@@ -2,7 +2,7 @@
 
 Code, trained weights and result files for the paper
 
-> T. Riahi, H. A. Mustafa, *Know Which Body Part to Trust: A Plug-in Per-Part Reliability Head for Few-Shot Gait Recognition*, submitted to Expert Systems with Applications.
+> T. Riahi, H. A. Mustafa, *Know Which Body Part to Trust: A Plug-in Per-Part Reliability Head for Few-Shot Gait Recognition*.
 
 The reliability head attaches to any **frozen** part-based gait model. For every body part of every sample, it predicts a variance that says how far that part can be trusted. A single Gaussian likelihood then provides:
 
