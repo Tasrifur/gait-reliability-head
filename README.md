@@ -38,7 +38,7 @@ The head has about 16k parameters. It is calibrated in a second stage on a small
 ## Installation
 
 ```bash
-git clone https://github.com/<your-account>/gait-reliability-head.git
+git clone https://github.com/Tasrifur/gait-reliability-head.git
 cd gait-reliability-head
 python -m venv .venv
 # Windows: .venv\Scripts\activate    Linux/macOS: source .venv/bin/activate
