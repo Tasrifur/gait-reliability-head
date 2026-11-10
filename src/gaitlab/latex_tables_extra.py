@@ -470,27 +470,49 @@ def f_uncertainty_examples(run='results/p4_2stage_occ'):
     s, v = ds.lt_split(12)['test'][3], CV.index('090')
     m = load(0, 'cpu')
     summ = J(f'{run}/uncertainty_validation.json')['summary']
-    fig = plt.figure(figsize=(FULL, 3.0))
-    gs = fig.add_gridspec(2, 4, height_ratios=[1, 1.15], hspace=0.35, wspace=0.55)
-    for k, q in enumerate([0, 6, 8]):
+    # one row: [GEI | variance bars] for NM, BG, CL, then the test-set CL/NM ratio. Each GEI sits directly left of
+    # its bars, so strip i of the silhouette is aligned with the bar of part i; part names label the first GEI.
+    W, H = FULL, 1.85
+    bot, top, left = 0.40, 0.24, 0.66                        # inches: x labels, titles, part names
+    h = H - bot - top
+    seqs = [0, 6, 8]
+    cols = np.where(np.max([ds.gei[s, q, v] for q in seqs], axis=(0, 1)) > 0.05 * ds.gei[s, 0, v].max())[0]
+    c0, c1 = max(cols.min() - 3, 0), min(cols.max() + 4, ds.gei.shape[-1])   # crop empty columns, same for all
+    img0 = ds.gei[s, 0, v][:, c0:c1]
+    g = h * img0.shape[1] / img0.shape[0]                    # GEI width that keeps its pixels square
+    gap_in, gap_out = 0.04, 0.30
+    bw = (W - left - 0.08 - 3 * (g + gap_in + gap_out)) / 4  # width of each bar panel
+    fig = plt.figure(figsize=(W, H))
+    ax = lambda x, w: fig.add_axes((x / W, bot / H, w / W, h / H))
+    x = left
+    for k, q in enumerate(seqs):
         with torch.no_grad():
             _, var = m.embed(torch.from_numpy(ds.get(s, q, v))[None])
-        a = fig.add_subplot(gs[0, k])
-        _show_gei(a, ds.gei[s, q, v])
+        img = ds.gei[s, q, v][:, c0:c1]
+        a = ax(x, g)
+        _show_gei(a, img)
+        strip = img.shape[0] / 8
         for r in range(1, 8):
-            a.axhline(8 * r, color=AMBER, lw=0.4)
-        a.set_title(f'{SEQS[q].upper()}, 90$^\\circ$'); a.axis('off')
-        b = fig.add_subplot(gs[1, k])
-        b.barh(range(8), var[0].numpy(), color=FLAME, height=0.7)
-        b.set_yticks(range(8)); b.set_yticklabels(PARTS if k == 0 else [''] * 8); b.invert_yaxis()
-        b.set_xlabel('predicted variance'); b.grid(axis='y', visible=False)
-    b = fig.add_subplot(gs[1, 3])
+            a.axhline(strip * r, color=AMBER, lw=0.4)
+        a.set_xticks([]); a.set_yticks([strip * (i + 0.5) for i in range(8)])
+        a.set_yticklabels(PARTS if k == 0 else [])
+        a.tick_params(axis='y', length=0)
+        for sp in a.spines.values():
+            sp.set_visible(False)
+        b = ax(x + g + gap_in, bw)
+        b.barh(range(8), var[0].numpy(), color=FLAME, height=0.62)
+        b.set_ylim(7.5, -0.5); b.set_yticks([]); b.grid(axis='y', visible=False)
+        b.set_xlabel('variance $s_i$')
+        b.xaxis.set_major_locator(plt.MaxNLocator(3))
+        fig.text((x + (g + gap_in + bw) / 2) / W, 1 - 0.06 / H, f'{SEQS[q].upper()}, 90$^\\circ$', ha='center', va='top')
+        x += g + gap_in + bw + gap_out
+    b = ax(x, bw)
     r = np.array([summ['ratio_cl_nm'][p]['mean'] for p in PARTS])
-    b.barh(range(8), r, color=INDIGO, height=0.7); b.axvline(1, color='k', lw=0.6)
-    b.set_yticks(range(8)); b.set_yticklabels([''] * 8); b.invert_yaxis()
-    b.set_xlabel('CL / NM ratio'); b.set_title('test set, 5 seeds'); b.grid(axis='y', visible=False)
-    fig.subplots_adjust(left=0.1, right=0.97, bottom=0.12, top=0.93)
-    plt.savefig(f'{FIG}/uncertainty_examples.pdf'); plt.close()
+    b.barh(range(8), r, color=INDIGO, height=0.62); b.axvline(1, color='k', lw=0.6)
+    b.set_ylim(7.5, -0.5); b.set_yticks([]); b.grid(axis='y', visible=False)
+    b.set_xlabel('CL / NM ratio'); b.set_xticks([0, 0.5, 1, 1.5])
+    fig.text((x + bw / 2) / W, 1 - 0.06 / H, 'test set, 5 seeds', ha='center', va='top')
+    plt.savefig(f'{FIG}/uncertainty_examples.pdf', bbox_inches=None); plt.close()
 
 
 def f_deletion_curves():
