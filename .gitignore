@@ -8,19 +8,19 @@ venv/
 
 # Datasets and caches (obtain from the dataset providers; see README)
 *.zip
-data/
-external/opengait_src/
-external/opengait_ckpt/
-external/dl/
+/data/
+/external/opengait_src/
+/external/opengait_ckpt/
+/external/dl/
 
 # Large regenerable embeddings and logs
-results/p5_frozen/*.pt
-results/p5_frozen/*.chunks/
-results/p5_plugin/train_emb_*.pt
-logs/
+/results/p5_frozen/*.pt
+/results/p5_frozen/*.chunks/
+/results/p5_plugin/train_emb_*.pt
+/logs/
 
 # Generated LaTeX output
-elsarticle/
+/elsarticle/
 
 # OS / editors
 .DS_Store
