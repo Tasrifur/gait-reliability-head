@@ -1,0 +1,49 @@
+# DPP-Net v0 trained/evaluated with the ORIGINAL notebook protocol, to measure
+# how much the protocol bugs inflate accuracy. Not for reporting as a result.
+#  - random 74/25/25 split (np.random.seed(42) permutation)
+#  - support: NM-05/06, k=5 drawn WITH replacement (<=2 distinct GEIs)
+#  - queries: drawn with replacement; NM probes from NM-01..06 (includes gallery)
+name: v0_dppnet_legacy
+seeds: [0, 1, 2, 3, 4]
+
+data:
+  cache: data/cache/casiab_gei.npz
+  split: legacy
+  min_frames: 15
+
+model:
+  name: dppnet
+  hidden_dim: 128
+  num_parts: 8
+  attention: residual
+
+train:
+  sampler: legacy
+  max_episodes: 5000
+  lr: 1.0e-3
+  wd: 1.0e-5
+  n_way: 20
+  k_shot: 5
+  n_query: 5
+  same_view: true
+  gallery_seqs: legacy_gallery
+  probe_seqs: all
+
+val:
+  legacy: true
+  every: 100
+  patience: 10
+  n_way: 20
+  k_shot: 5
+  n_query: 5
+  same_view: true
+  episodes: 100
+  conds: [nm]          # original notebook validated on NM probes only
+
+eval:
+  # same checkpoint, two evaluation protocols, same 25 legacy test subjects
+  - {name: legacy_sv_20way_5shot, kind: episodic, legacy: true, n_way: 20, k_shot: 5, n_query: 5, same_view: true, episodes: 500}
+  - {name: fixed_sv_20way_4shot, kind: episodic, n_way: 20, k_shot: 4, n_query: 2, same_view: true, episodes: 500}
+  - {name: fixed_cv_20way_4shot, kind: episodic, n_way: 20, k_shot: 4, n_query: 2, same_view: false, episodes: 500}
+  - {name: full_gallery_sv, kind: full_gallery, cross_view: false}
+  - {name: full_gallery_cv, kind: full_gallery, cross_view: true}

@@ -1,0 +1,30 @@
+diff --git a/opengait/main.py b/opengait/main.py
+index 70446da..375cf6d 100644
+--- a/opengait/main.py
++++ b/opengait/main.py
+@@ -62,7 +62,7 @@ def run_model(cfgs, training):
+ 
+ 
+ if __name__ == '__main__':
+-    torch.distributed.init_process_group('nccl', init_method='env://')
++    torch.distributed.init_process_group('gloo' if os.name == 'nt' else 'nccl', init_method='env://')  # gloo on Windows (no NCCL)
+     if torch.distributed.get_world_size() != torch.cuda.device_count():
+         raise ValueError("Expect number of available GPUs({}) equals to the world size({}).".format(
+             torch.cuda.device_count(), torch.distributed.get_world_size()))
+diff --git a/opengait/modeling/models/__init__.py b/opengait/modeling/models/__init__.py
+index ac21357..6d82e65 100644
+--- a/opengait/modeling/models/__init__.py
++++ b/opengait/modeling/models/__init__.py
+@@ -8,7 +8,11 @@ package_dir = Path(__file__).resolve().parent
+ for (_, module_name, _) in iter_modules([str(package_dir)]):
+ 
+     # import the module and iterate through its attributes
+-    module = import_module(f"{__name__}.{module_name}")
++    try:
++        module = import_module(f"{__name__}.{module_name}")
++    except Exception as e:  # local patch: skip models whose optional deps fail (e.g. xformers/triton on Windows)
++        print(f"[models] skipping {module_name}: {type(e).__name__}")
++        continue
+     for attribute_name in dir(module):
+         attribute = getattr(module, attribute_name)
+ 

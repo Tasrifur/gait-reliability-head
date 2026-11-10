@@ -1,0 +1,86 @@
+{
+  "name": "v0_dppnet_legacy",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "data": {
+    "cache": "data/cache/casiab_gei.npz",
+    "split": "legacy",
+    "min_frames": 15
+  },
+  "model": {
+    "name": "dppnet",
+    "hidden_dim": 128,
+    "num_parts": 8,
+    "attention": "residual"
+  },
+  "train": {
+    "sampler": "legacy",
+    "max_episodes": 5000,
+    "lr": 0.001,
+    "wd": 1e-05,
+    "n_way": 20,
+    "k_shot": 5,
+    "n_query": 5,
+    "same_view": true,
+    "gallery_seqs": "legacy_gallery",
+    "probe_seqs": "all"
+  },
+  "val": {
+    "legacy": true,
+    "every": 100,
+    "patience": 10,
+    "n_way": 20,
+    "k_shot": 5,
+    "n_query": 5,
+    "same_view": true,
+    "episodes": 100,
+    "conds": [
+      "nm"
+    ]
+  },
+  "eval": [
+    {
+      "name": "legacy_sv_20way_5shot",
+      "kind": "episodic",
+      "legacy": true,
+      "n_way": 20,
+      "k_shot": 5,
+      "n_query": 5,
+      "same_view": true,
+      "episodes": 500
+    },
+    {
+      "name": "fixed_sv_20way_4shot",
+      "kind": "episodic",
+      "n_way": 20,
+      "k_shot": 4,
+      "n_query": 2,
+      "same_view": true,
+      "episodes": 500
+    },
+    {
+      "name": "fixed_cv_20way_4shot",
+      "kind": "episodic",
+      "n_way": 20,
+      "k_shot": 4,
+      "n_query": 2,
+      "same_view": false,
+      "episodes": 500
+    },
+    {
+      "name": "full_gallery_sv",
+      "kind": "full_gallery",
+      "cross_view": false
+    },
+    {
+      "name": "full_gallery_cv",
+      "kind": "full_gallery",
+      "cross_view": true
+    }
+  ]
+}

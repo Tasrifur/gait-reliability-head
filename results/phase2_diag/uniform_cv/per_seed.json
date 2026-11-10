@@ -1,0 +1,697 @@
+[
+  {
+    "nm": {
+      "rank1_dynamic": 71.75774134790528,
+      "rank1_test_time_uniform": 71.75774134790528,
+      "rank1_solo_part": {
+        "head": 34.845173041894355,
+        "shoulders": 34.36247723132969,
+        "upper torso": 21.293260473588344,
+        "lower torso": 23.67941712204007,
+        "pelvis": 27.859744990892533,
+        "thighs": 24.7632058287796,
+        "calves": 14.6448087431694,
+        "feet": 17.859744990892533
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.23350930213928223,
+        "shoulders": 0.16705165803432465,
+        "upper torso": 0.05733481049537659,
+        "lower torso": 0.09477495402097702,
+        "pelvis": 0.11444387584924698,
+        "thighs": 0.1182476207613945,
+        "calves": 0.04845332354307175,
+        "feet": 0.16618448495864868
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7074681520462036,
+      "frac_parts_with_negative_margin_contrib": 0.32445356249809265,
+      "frac_queries_with_any_part_against": 0.9130236506462097,
+      "n_queries": 10980
+    },
+    "bg": {
+      "rank1_dynamic": 58.142726440988106,
+      "rank1_test_time_uniform": 58.142726440988106,
+      "rank1_solo_part": {
+        "head": 29.29551692589204,
+        "shoulders": 22.580054894784997,
+        "upper torso": 11.72003659652333,
+        "lower torso": 10.384263494967978,
+        "pelvis": 11.253430924062213,
+        "thighs": 15.65416285452882,
+        "calves": 11.765782250686184,
+        "feet": 15.114364135407136
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.2509232461452484,
+        "shoulders": 0.16976143419742584,
+        "upper torso": 0.04613231122493744,
+        "lower torso": 0.08064738661050797,
+        "pelvis": 0.09185469150543213,
+        "thighs": 0.10924629867076874,
+        "calves": 0.04790028557181358,
+        "feet": 0.2035343050956726
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7255260944366455,
+      "frac_parts_with_negative_margin_contrib": 0.3896729052066803,
+      "frac_queries_with_any_part_against": 0.9796889424324036,
+      "n_queries": 10930
+    },
+    "cl": {
+      "rank1_dynamic": 37.978142076502735,
+      "rank1_test_time_uniform": 37.978142076502735,
+      "rank1_solo_part": {
+        "head": 16.22040072859745,
+        "shoulders": 9.808743169398907,
+        "upper torso": 6.4389799635701275,
+        "lower torso": 3.5154826958105647,
+        "pelvis": 7.185792349726776,
+        "thighs": 14.061930783242259,
+        "calves": 12.50455373406193,
+        "feet": 14.453551912568306
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.23155324161052704,
+        "shoulders": 0.12146245688199997,
+        "upper torso": 0.04243685305118561,
+        "lower torso": 0.11469550430774689,
+        "pelvis": 0.11607774347066879,
+        "thighs": 0.12119768559932709,
+        "calves": 0.03350159525871277,
+        "feet": 0.21907493472099304
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7546448111534119,
+      "frac_parts_with_negative_margin_contrib": 0.417326956987381,
+      "frac_queries_with_any_part_against": 0.9896174669265747,
+      "n_queries": 10980
+    },
+    "episode_dependence_cl_090to054": {
+      "N=1_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      },
+      "N=5_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      },
+      "N=20_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      }
+    }
+  },
+  {
+    "nm": {
+      "rank1_dynamic": 71.72131147540983,
+      "rank1_test_time_uniform": 71.72131147540983,
+      "rank1_solo_part": {
+        "head": 35.200364298724956,
+        "shoulders": 31.903460837887067,
+        "upper torso": 20.081967213114755,
+        "lower torso": 23.47905282331512,
+        "pelvis": 30.018214936247723,
+        "thighs": 25.018214936247723,
+        "calves": 15.519125683060109,
+        "feet": 18.624772313296905
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.26072004437446594,
+        "shoulders": 0.12869670987129211,
+        "upper torso": 0.044580429792404175,
+        "lower torso": 0.10291716456413269,
+        "pelvis": 0.12167448550462723,
+        "thighs": 0.11097241938114166,
+        "calves": 0.03980754315853119,
+        "feet": 0.1906312257051468
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.6625683307647705,
+      "frac_parts_with_negative_margin_contrib": 0.322279155254364,
+      "frac_queries_with_any_part_against": 0.911475419998169,
+      "n_queries": 10980
+    },
+    "bg": {
+      "rank1_dynamic": 60.10064043915828,
+      "rank1_test_time_uniform": 60.10064043915828,
+      "rank1_solo_part": {
+        "head": 28.847209515096065,
+        "shoulders": 22.973467520585544,
+        "upper torso": 10.80512351326624,
+        "lower torso": 10.10064043915828,
+        "pelvis": 12.02195791399817,
+        "thighs": 15.892040256175664,
+        "calves": 12.095150960658737,
+        "feet": 16.413540713632205
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.28252673149108887,
+        "shoulders": 0.13754603266716003,
+        "upper torso": 0.03940477967262268,
+        "lower torso": 0.07865994423627853,
+        "pelvis": 0.09554633498191833,
+        "thighs": 0.10120178014039993,
+        "calves": 0.047787267714738846,
+        "feet": 0.21732713282108307
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.6907593607902527,
+      "frac_parts_with_negative_margin_contrib": 0.3783394396305084,
+      "frac_queries_with_any_part_against": 0.9706313014030457,
+      "n_queries": 10930
+    },
+    "cl": {
+      "rank1_dynamic": 37.06739526411658,
+      "rank1_test_time_uniform": 37.06739526411658,
+      "rank1_solo_part": {
+        "head": 15.500910746812385,
+        "shoulders": 9.517304189435338,
+        "upper torso": 5.683060109289618,
+        "lower torso": 4.462659380692168,
+        "pelvis": 8.469945355191257,
+        "thighs": 15.182149362477231,
+        "calves": 13.051001821493625,
+        "feet": 15.400728597449909
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.25300925970077515,
+        "shoulders": 0.09071308374404907,
+        "upper torso": 0.042896755039691925,
+        "lower torso": 0.09607402235269547,
+        "pelvis": 0.13565650582313538,
+        "thighs": 0.10099812597036362,
+        "calves": 0.03417601063847542,
+        "feet": 0.2464761734008789
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7076502442359924,
+      "frac_parts_with_negative_margin_contrib": 0.4162454605102539,
+      "frac_queries_with_any_part_against": 0.9887067675590515,
+      "n_queries": 10980
+    },
+    "episode_dependence_cl_090to054": {
+      "N=1_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      },
+      "N=5_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      },
+      "N=20_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      }
+    }
+  },
+  {
+    "nm": {
+      "rank1_dynamic": 72.30418943533698,
+      "rank1_test_time_uniform": 72.30418943533698,
+      "rank1_solo_part": {
+        "head": 34.08925318761384,
+        "shoulders": 33.998178506375226,
+        "upper torso": 21.930783242258652,
+        "lower torso": 19.918032786885245,
+        "pelvis": 26.785063752276866,
+        "thighs": 27.140255009107467,
+        "calves": 18.73406193078324,
+        "feet": 15.46448087431694
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.22641141712665558,
+        "shoulders": 0.1481800079345703,
+        "upper torso": 0.06094873324036598,
+        "lower torso": 0.09594185650348663,
+        "pelvis": 0.11502588540315628,
+        "thighs": 0.11587178707122803,
+        "calves": 0.07805819809436798,
+        "feet": 0.15956217050552368
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7028233408927917,
+      "frac_parts_with_negative_margin_contrib": 0.3189321458339691,
+      "frac_queries_with_any_part_against": 0.9035519361495972,
+      "n_queries": 10980
+    },
+    "bg": {
+      "rank1_dynamic": 58.96614821591949,
+      "rank1_test_time_uniform": 58.96614821591949,
+      "rank1_solo_part": {
+        "head": 27.68526989935956,
+        "shoulders": 21.774931381518755,
+        "upper torso": 11.866422689844464,
+        "lower torso": 8.27996340347667,
+        "pelvis": 11.21683440073193,
+        "thighs": 16.001829826166514,
+        "calves": 13.705397987191217,
+        "feet": 13.93412625800549
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.2518939673900604,
+        "shoulders": 0.159633070230484,
+        "upper torso": 0.0556236207485199,
+        "lower torso": 0.0795833021402359,
+        "pelvis": 0.07839769870042801,
+        "thighs": 0.09770885109901428,
+        "calves": 0.08547338843345642,
+        "feet": 0.19168609380722046
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7243366837501526,
+      "frac_parts_with_negative_margin_contrib": 0.3823307454586029,
+      "frac_queries_with_any_part_against": 0.9770357012748718,
+      "n_queries": 10930
+    },
+    "cl": {
+      "rank1_dynamic": 39.58105646630237,
+      "rank1_test_time_uniform": 39.58105646630237,
+      "rank1_solo_part": {
+        "head": 15.965391621129326,
+        "shoulders": 9.380692167577413,
+        "upper torso": 4.872495446265938,
+        "lower torso": 3.8615664845173043,
+        "pelvis": 8.369763205828779,
+        "thighs": 14.335154826958105,
+        "calves": 15.591985428051002,
+        "feet": 13.688524590163935
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.24237491190433502,
+        "shoulders": 0.08848226070404053,
+        "upper torso": 0.04017859324812889,
+        "lower torso": 0.11407815665006638,
+        "pelvis": 0.11066509783267975,
+        "thighs": 0.09605076164007187,
+        "calves": 0.0930296927690506,
+        "feet": 0.21514058113098145
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7422586679458618,
+      "frac_parts_with_negative_margin_contrib": 0.4131716787815094,
+      "frac_queries_with_any_part_against": 0.9896174669265747,
+      "n_queries": 10980
+    },
+    "episode_dependence_cl_090to054": {
+      "N=1_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      },
+      "N=5_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      },
+      "N=20_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      }
+    }
+  },
+  {
+    "nm": {
+      "rank1_dynamic": 71.12021857923497,
+      "rank1_test_time_uniform": 71.12021857923497,
+      "rank1_solo_part": {
+        "head": 33.533697632058285,
+        "shoulders": 36.721311475409834,
+        "upper torso": 23.979963570127506,
+        "lower torso": 24.171220400728597,
+        "pelvis": 25.683060109289617,
+        "thighs": 26.34790528233151,
+        "calves": 17.77777777777778,
+        "feet": 13.60655737704918
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.21564163267612457,
+        "shoulders": 0.1818350851535797,
+        "upper torso": 0.06716413795948029,
+        "lower torso": 0.1081729605793953,
+        "pelvis": 0.12049074470996857,
+        "thighs": 0.1111832708120346,
+        "calves": 0.06448615342378616,
+        "feet": 0.13102595508098602
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.714207649230957,
+      "frac_parts_with_negative_margin_contrib": 0.3273110091686249,
+      "frac_queries_with_any_part_against": 0.9157559275627136,
+      "n_queries": 10980
+    },
+    "bg": {
+      "rank1_dynamic": 56.56907593778591,
+      "rank1_test_time_uniform": 56.56907593778591,
+      "rank1_solo_part": {
+        "head": 26.495882891125344,
+        "shoulders": 23.934126258005488,
+        "upper torso": 13.321134492223239,
+        "lower torso": 9.158279963403476,
+        "pelvis": 9.954254345837146,
+        "thighs": 14.510521500457456,
+        "calves": 13.174748398902103,
+        "feet": 12.11344922232388
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.25193312764167786,
+        "shoulders": 0.18834948539733887,
+        "upper torso": 0.055218011140823364,
+        "lower torso": 0.09138738363981247,
+        "pelvis": 0.0765584260225296,
+        "thighs": 0.10246217995882034,
+        "calves": 0.07228534668684006,
+        "feet": 0.16180607676506042
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7340347766876221,
+      "frac_parts_with_negative_margin_contrib": 0.38849496841430664,
+      "frac_queries_with_any_part_against": 0.9761207699775696,
+      "n_queries": 10930
+    },
+    "cl": {
+      "rank1_dynamic": 36.766848816029146,
+      "rank1_test_time_uniform": 36.766848816029146,
+      "rank1_solo_part": {
+        "head": 17.459016393442624,
+        "shoulders": 10.537340619307832,
+        "upper torso": 6.757741347905283,
+        "lower torso": 3.7887067395264116,
+        "pelvis": 7.131147540983607,
+        "thighs": 12.932604735883425,
+        "calves": 15.29143897996357,
+        "feet": 11.675774134790528
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.2127700001001358,
+        "shoulders": 0.13164132833480835,
+        "upper torso": 0.04099111258983612,
+        "lower torso": 0.1302560567855835,
+        "pelvis": 0.11514835059642792,
+        "thighs": 0.12014470249414444,
+        "calves": 0.07884931564331055,
+        "feet": 0.17019906640052795
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7613843083381653,
+      "frac_parts_with_negative_margin_contrib": 0.4165983498096466,
+      "frac_queries_with_any_part_against": 0.9906193017959595,
+      "n_queries": 10980
+    },
+    "episode_dependence_cl_090to054": {
+      "N=1_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      },
+      "N=5_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      },
+      "N=20_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      }
+    }
+  },
+  {
+    "nm": {
+      "rank1_dynamic": 71.57559198542805,
+      "rank1_test_time_uniform": 71.57559198542805,
+      "rank1_solo_part": {
+        "head": 34.162112932604735,
+        "shoulders": 35.18214936247723,
+        "upper torso": 20.327868852459016,
+        "lower torso": 23.55191256830601,
+        "pelvis": 30.473588342440802,
+        "thighs": 25.75591985428051,
+        "calves": 15.801457194899818,
+        "feet": 13.20582877959927
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.2289431095123291,
+        "shoulders": 0.1852785050868988,
+        "upper torso": 0.05287934094667435,
+        "lower torso": 0.09876357764005661,
+        "pelvis": 0.1202990785241127,
+        "thighs": 0.10557770729064941,
+        "calves": 0.06604955345392227,
+        "feet": 0.14220914244651794
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.6931694149971008,
+      "frac_parts_with_negative_margin_contrib": 0.32778915762901306,
+      "frac_queries_with_any_part_against": 0.9192167520523071,
+      "n_queries": 10980
+    },
+    "bg": {
+      "rank1_dynamic": 57.236962488563584,
+      "rank1_test_time_uniform": 57.236962488563584,
+      "rank1_solo_part": {
+        "head": 26.78865507776761,
+        "shoulders": 24.217749313815187,
+        "upper torso": 10.649588289112534,
+        "lower torso": 9.835315645013724,
+        "pelvis": 11.701738334858188,
+        "thighs": 15.928636779505947,
+        "calves": 13.000914913083257,
+        "feet": 11.665141811527905
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.239537313580513,
+        "shoulders": 0.1799529492855072,
+        "upper torso": 0.045971762388944626,
+        "lower torso": 0.07780814915895462,
+        "pelvis": 0.0906800851225853,
+        "thighs": 0.10252842307090759,
+        "calves": 0.08368182927370071,
+        "feet": 0.17983950674533844
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7236047387123108,
+      "frac_parts_with_negative_margin_contrib": 0.39127400517463684,
+      "frac_queries_with_any_part_against": 0.9779505729675293,
+      "n_queries": 10930
+    },
+    "cl": {
+      "rank1_dynamic": 34.744990892531874,
+      "rank1_test_time_uniform": 34.744990892531874,
+      "rank1_solo_part": {
+        "head": 14.143897996357012,
+        "shoulders": 10.29143897996357,
+        "upper torso": 5.491803278688525,
+        "lower torso": 4.271402550091075,
+        "pelvis": 7.276867030965391,
+        "thighs": 14.571948998178506,
+        "calves": 14.116575591985429,
+        "feet": 11.630236794171221
+      },
+      "mean_weight": {
+        "head": 0.125,
+        "shoulders": 0.125,
+        "upper torso": 0.125,
+        "lower torso": 0.125,
+        "pelvis": 0.125,
+        "thighs": 0.125,
+        "calves": 0.125,
+        "feet": 0.125
+      },
+      "entropy_norm_mean": 0.9999999403953552,
+      "effective_parts_mean": 7.999999523162842,
+      "frac_weight_top4": 0.5,
+      "margin_share_mean": {
+        "head": 0.23385702073574066,
+        "shoulders": 0.14930927753448486,
+        "upper torso": 0.04605259746313095,
+        "lower torso": 0.11776173114776611,
+        "pelvis": 0.10605939477682114,
+        "thighs": 0.11232001334428787,
+        "calves": 0.05713845416903496,
+        "feet": 0.17750151455402374
+      },
+      "frac_top_weight_part_not_top_margin_part": 0.7386156916618347,
+      "frac_parts_with_negative_margin_contrib": 0.42139115929603577,
+      "frac_queries_with_any_part_against": 0.9907103776931763,
+      "n_queries": 10980
+    },
+    "episode_dependence_cl_090to054": {
+      "N=1_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      },
+      "N=5_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      },
+      "N=20_vs_N=50": {
+        "mean_L1": 0.0,
+        "top_part_changes": 0.0
+      }
+    }
+  }
+]

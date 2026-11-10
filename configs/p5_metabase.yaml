@@ -1,0 +1,60 @@
+# Phase 5 controlled comparison: metabase head on the shared v0+BN encoder; everything else identical to configs/p3_bn.yaml (cross-view).
+name: p5_metabase
+seeds:
+- 0
+- 1
+- 2
+- 3
+- 4
+data:
+  cache: data/cache/casiab_gei.npz
+  split: lt
+  n_val: 12
+  min_frames: 15
+model:
+  name: head
+  head: metabase
+train:
+  max_episodes: 8000
+  lr: 0.001
+  wd: 1.0e-05
+  n_way: 20
+  k_shot: 4
+  n_query: 5
+  same_view: false
+  gallery_seqs: nm_all
+  probe_seqs: all
+  pretrain_steps: 3000
+val:
+  every: 200
+  patience: 12
+  n_way: 10
+  k_shot: 4
+  n_query: 2
+  same_view: false
+  episodes: 100
+  conds:
+  - nm
+  - bg
+  - cl
+eval:
+- name: sv_20way_4shot
+  kind: episodic
+  n_way: 20
+  k_shot: 4
+  n_query: 2
+  same_view: true
+  episodes: 500
+- name: cv_20way_4shot
+  kind: episodic
+  n_way: 20
+  k_shot: 4
+  n_query: 2
+  same_view: false
+  episodes: 500
+- name: full_gallery_cv
+  kind: full_gallery
+  cross_view: true
+- name: full_gallery_sv
+  kind: full_gallery
+  cross_view: false

@@ -1,0 +1,8 @@
+{
+  "dataset": "oumvlp",
+  "b1": "results/md_oumvlp_b1",
+  "calibration_ids": 300,
+  "n_way": 20,
+  "iters": 3000,
+  "erase_p": 0.5
+}

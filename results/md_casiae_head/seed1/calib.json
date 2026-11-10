@@ -1,0 +1,8 @@
+{
+  "dataset": "casiae",
+  "b1": "results/md_casiae_b1",
+  "calibration_ids": 40,
+  "n_way": 20,
+  "iters": 3000,
+  "erase_p": 0.5
+}

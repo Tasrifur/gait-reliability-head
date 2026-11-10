@@ -1,0 +1,8 @@
+{
+  "dataset": "casiab",
+  "b1": "results/p3_bn_aux",
+  "calibration_ids": 12,
+  "n_way": 10,
+  "iters": 3000,
+  "erase_p": 0.5
+}

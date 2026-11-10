@@ -1,0 +1,42 @@
+# DPP-Net v0 (original architecture) under the fixed protocol.
+name: v0_dppnet_lt
+seeds: [0, 1, 2, 3, 4]
+
+data:
+  cache: data/cache/casiab_gei.npz
+  split: lt          # 001-074 train (10 held out for val), 075-124 test
+  n_val: 12           # 12 so 10-way same-view val works at every view (subject 005 lacks 000)
+  min_frames: 15
+
+model:
+  name: dppnet
+  hidden_dim: 128
+  num_parts: 8
+  attention: residual
+
+train:
+  max_episodes: 5000
+  lr: 1.0e-3
+  wd: 1.0e-5
+  n_way: 20
+  k_shot: 4
+  n_query: 5
+  same_view: true
+  gallery_seqs: nm_all   # support drawn from NM-01..06 of training subjects
+  probe_seqs: all        # queries from any condition, never a support cell
+
+val:
+  every: 100
+  patience: 10
+  n_way: 10            # only 10 validation subjects
+  k_shot: 4
+  n_query: 2
+  same_view: true
+  episodes: 100
+  conds: [nm, bg, cl]
+
+eval:
+  - {name: sv_20way_4shot, kind: episodic, n_way: 20, k_shot: 4, n_query: 2, same_view: true, episodes: 500}
+  - {name: cv_20way_4shot, kind: episodic, n_way: 20, k_shot: 4, n_query: 2, same_view: false, episodes: 500}
+  - {name: full_gallery_cv, kind: full_gallery, cross_view: true}
+  - {name: full_gallery_sv, kind: full_gallery, cross_view: false}

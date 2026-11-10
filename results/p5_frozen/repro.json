@@ -1,0 +1,12 @@
+{
+  "gaitpart": {
+    "published_nn>nm": 95.9909090909091,
+    "published_nn>bg": 90.67206011881336,
+    "published_nn>cl": 78.62727272727273
+  },
+  "gaitgl": {
+    "published_nn>nm": 97.4090909090909,
+    "published_nn>bg": 94.78709357021044,
+    "published_nn>cl": 83.82727272727271
+  }
+}

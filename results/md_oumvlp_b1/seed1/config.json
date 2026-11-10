@@ -1,0 +1,52 @@
+{
+  "name": "md_oumvlp_b1",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "data": {
+    "type": "dense",
+    "name": "oumvlp",
+    "n_cal": 300
+  },
+  "model": {
+    "name": "protonet",
+    "encoder": "v0bn",
+    "scales": [
+      8
+    ],
+    "pool": "mean",
+    "l2norm": false,
+    "scale": 1.0
+  },
+  "train": {
+    "max_episodes": 8000,
+    "lr": 0.001,
+    "wd": 1e-05,
+    "n_way": 20,
+    "k_shot": 4,
+    "n_query": 5,
+    "same_view": false,
+    "gallery_seqs": "nm_all",
+    "probe_seqs": "all",
+    "aux_part_loss": 1.0
+  },
+  "val": {
+    "every": 200,
+    "patience": 12,
+    "n_way": 20,
+    "k_shot": 4,
+    "n_query": 2,
+    "same_view": false,
+    "episodes": 100,
+    "conds": [
+      "nm",
+      "bg",
+      "cl"
+    ]
+  },
+  "eval": []
+}
