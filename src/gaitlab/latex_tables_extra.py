@@ -71,21 +71,21 @@ def t_complexity():
     write('t_complexity', '\n'.join(L) + '\n')
 
 
-T_NOTATION = r"""\begin{tabular}{ll}
+T_NOTATION = r"""\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.66\columnwidth}@{}}
 \toprule
 Symbol & Meaning \\
 \midrule
-$x$, $q$ & input sample (silhouette sequence or GEI); probe sample \\
-$P$, $D$ & number of horizontal body parts; part embedding dimension \\
-$\boldsymbol{\mu}_i(x)\in\mathbb{R}^D$ & frozen embedding of part $i$ of sample $x$ \\
-$s_i(x)>0$ & predicted variance (unreliability) of part $i$ of sample $x$ \\
+$x$, $q$ & input sample (sequence or GEI); probe \\
+$P$, $D$ & number of parts; embedding dimension \\
+$\boldsymbol{\mu}_i(x)\in\mathbb{R}^D$ & frozen embedding of part $i$ of $x$ \\
+$s_i(x)>0$ & predicted variance of part $i$ of $x$ \\
 $h_\phi$ & reliability head with parameters $\phi$ \\
-$\mathcal{E}_n=\{x_{n,1},\dots,x_{n,K}\}$ & enrollment set of identity $n$ ($K$ samples) \\
-$\boldsymbol{c}_{n,i}$, $s_i(c_n)$ & fused prototype mean and variance of part $i$ of identity $n$ \\
-$\ell(q,c_n)$, $\ell_i(q,c_n)$ & matching log-likelihood and its part-$i$ term \\
-$\omega_i(q,c_n)$ & effective part weight $1/(s_i(q)+s_i(c_n))$ \\
-$\Delta_i(q)$ & contribution of part $i$ to the decision margin \\
-$\mathcal{C}$, $\mathcal{G}$ & calibration identities; enrolled gallery identities \\
+$\mathcal{E}_n=\{x_{n,k}\}_{k=1}^{K}$ & enrollment set of identity $n$ \\
+$\boldsymbol{c}_{n,i}$, $s_i(c_n)$ & prototype mean and variance of part $i$ \\
+$\ell(q,c_n)$, $\ell_i(q,c_n)$ & log-likelihood; its part-$i$ term \\
+$\omega_i(q,c_n)$ & effective weight $1/(s_i(q)+s_i(c_n))$ \\
+$\Delta_i(q)$ & contribution of part $i$ to the margin \\
+$\mathcal{C}$, $\mathcal{G}$ & calibration identities; enrolled gallery \\
 $\tau$ & open-set acceptance threshold \\
 \bottomrule
 \end{tabular}
@@ -384,6 +384,34 @@ def f_corruption_types():
     plt.tight_layout(w_pad=0.4); plt.savefig(f'{FIG}/corruption_types.pdf'); plt.close()
 
 
+def f_overview_thumbs():
+    """Silhouette thumbnails for the overview diagram (Fig. 1): three enrollment walks of one test identity at
+    90 deg, the second band-occluded, and a probe of the same identity at 72 deg; strips of the 8 parts marked."""
+    if not os.path.exists('data/cache/casiab_gei.npz'):
+        print('f_overview_thumbs: dataset caches not built (see README), skipped'); return
+    plt = _style()
+    from .data.casiab import CasiaB, SEQS, VIEWS as CV
+    ds = CasiaB('data/cache/casiab_gei.npz')
+    s = ds.lt_split(12)['test'][3]
+    cells = {'ov_enroll1': ('nm-01', '090', None), 'ov_enroll2': ('nm-02', '090', 'hband'),
+             'ov_enroll3': ('nm-03', '090', None), 'ov_probe': ('nm-05', '072', None)}
+    for name, (q, v, k) in cells.items():
+        cell = (s, SEQS.index(q), CV.index(v))
+        x = ds.get(*cell)[0]
+        if k:
+            t, h = 34, 12                                     # a visible band across the thighs
+            x = x.copy(); x[t:t + h, :] = 0
+        fig = plt.figure(figsize=(0.62, 0.62))
+        a = fig.add_axes((0, 0, 1, 1))
+        _show_gei(a, np.clip(x[:, 6:58], 0, 1))
+        for r in range(1, 8):
+            a.axhline(8 * r, color=AMBER, lw=0.35, alpha=0.9)
+        a.set_xticks([]); a.set_yticks([]); a.grid(False)
+        for sp in a.spines.values():
+            sp.set_visible(True); sp.set_color('#555555'); sp.set_linewidth(0.5)
+        fig.savefig(f'{FIG}/{name}.pdf', bbox_inches=None, pad_inches=0); plt.close(fig)
+
+
 def f_uncertainty_examples(run='results/p4_2stage_occ'):
     """Predicted per-part variance for one test subject (NM/BG/CL at 90 deg, seed 0) and the median CL/NM
     variance ratio per part over the test set (uncertainty_validation.json of the same run)."""
@@ -447,7 +475,7 @@ def f_deletion_curves():
 if __name__ == '__main__':
     os.makedirs(FIG, exist_ok=True)
     for f in [t_datasets, t_reproduction, t_static, f_robustness_bars, f_heads_bars, f_attention_bars, f_frozen_types,
-              f_baselines, f_corruption_types, f_uncertainty_examples, f_deletion_curves]:
+              f_baselines, f_corruption_types, f_overview_thumbs, f_uncertainty_examples, f_deletion_curves]:
         f(); print('ok', f.__name__)
     A = J('results/paper_analyses.json')
     if 'timing' in A:
