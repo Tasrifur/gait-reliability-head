@@ -5,6 +5,7 @@ Usage: python -m gaitlab.latex_tables
 """
 import json
 import os
+import re
 
 import numpy as np
 
@@ -80,12 +81,16 @@ def t_multidataset():
 
 # ---------------------------------------------------------------- T2 frozen backbones
 def t_frozen():
+    """Frozen checkpoints with and without the head: clean, enrollment, all four probe corruptions (merged from
+    the former t_frozen_types; the unseen corruptions come from frozen_occ_types) and open-set operation."""
     X = J('results/p5_plugin/final_protocol.json')
+    O = frozen_occ_types()
     rows = [('Clean cross-view', lambda r, rule: np.mean([r[f'fgcv>{c}'] for c in C3])),
             ('Clothing change (CL)', lambda r, rule: r['fgcv>cl']),
             ('Mismatched-condition gallery', lambda r, rule: np.mean([r[f'S1_{g}>{p}'] for g in C3 for p in C3 if g != p])),
             ('Corrupted enrollment', lambda r, rule: np.mean([r[f'S3_corrupt>{c}'] for c in C3])),
-            ('Occluded probes (horizontal band)', lambda r, rule: np.mean([r[f'S4_occprobe>{c}'] for c in C3])),
+            ('Occluded probes: horizontal band$^\\dagger$', lambda r, rule: np.mean([r[f'S4_occprobe>{c}'] for c in C3])),
+            ('\\quad lower body', 'bottom'), ('\\quad vertical band', 'vband'), ('\\quad segmentation noise', 'noise'),
             ('Open-set AUROC, CL', lambda r, rule: 100 * r[f'os_cl/{rule}/auroc']),
             ('Open-set OSCR, CL', lambda r, rule: 100 * r[f'os_cl/{rule}/oscr']),
             ('Open-set AUROC, occluded', lambda r, rule: 100 * r[f'os_nm_occ/{rule}/auroc']),
@@ -99,18 +104,20 @@ def t_frozen():
     for label, fn in rows:
         cells = []
         for bb, _, _ in bbs:
-            folds = list(X[bb])
-            fr = {f: fn(X[bb][f]['frozen']['eval'], X[bb][f]['frozen']['rule']) for f in folds}
-            hv, wins = [], 0
-            for f in folds:
-                for s, h in X[bb][f]['head'].items():
-                    v = fn(h['eval'], h['rule'])
-                    hv.append(v); wins += v > fr[f]
-            a = np.mean(list(fr.values()))
-            b = np.mean(hv)
+            if isinstance(fn, str):                          # unseen corruption types
+                D = O[bb]
+                fr = {f: D[f]['frozen'][fn] for f in D}
+                runs = [(f, r[fn]) for f in D for r in D[f]['head'].values()]
+            else:
+                D = X[bb]
+                fr = {f: fn(D[f]['frozen']['eval'], D[f]['frozen']['rule']) for f in D}
+                runs = [(f, fn(h['eval'], h['rule'])) for f in D for h in D[f]['head'].values()]
+            hv = [v for _, v in runs]
+            wins = sum(v > fr[f] for f, v in runs)
+            a, b = np.mean(list(fr.values())), np.mean(hv)
             cells += [f'{a:.2f}', (f'\\textbf{{{b:.2f}}}' if b - a >= 0.5 else f'{b:.2f}'), f'{wins}/{len(hv)}']
         L.append(f'{label} & ' + ' & '.join(cells) + ' \\\\')
-        if label.startswith('Occluded'):
+        if label.endswith('noise'):
             L.append('\\midrule')
     L += ['\\bottomrule', '\\end{tabular}']
     write('t_frozen', '\n'.join(L) + '\n')
@@ -128,7 +135,8 @@ def md_table_to_tex(md_path, header_match, colspec, drop_cols=(), rename=None):
         if set(''.join(cells)) <= set('-: '):
             continue
         rows.append([c for j, c in enumerate(cells) if j not in drop_cols])
-    esc = lambda c: (c.replace('**', '').replace('%', '\\%').replace('±', '$\\pm$').replace('_', '\\_')
+    esc = lambda c: (re.sub(r'([\d.]+) ± ([\d.]+)', r'\1{\\scriptsize$\\pm$\2}', c.replace('**', ''))  # compact CI
+                     .replace('%', '\\%').replace('±', '$\\pm$').replace('_', '\\_')
                      .replace('—', '--').replace('≥', '$\\geq$'))
     if rename:
         rows[0] = rename
@@ -140,7 +148,10 @@ def md_table_to_tex(md_path, header_match, colspec, drop_cols=(), rename=None):
 
 RELABEL = [('Original DPP-Net (residual attention)', 'Attention baseline (residual attention)'),
            ('(model of record)', '(full model, ours)'),
-           ('Model of record: B1 + N1/N2/N4 occ-aware (ours)', 'B1 + reliability head, occlusion-aware (ours)')]
+           ('Model of record: B1 + N1/N2/N4 occ-aware (ours)', 'B1 + reliability head (ours)'),
+           ('B1: Proto + per-strip aux (ours)', 'B1 (ours)'),
+           ('+ N1 per-strip uncertainty (two-stage)', '+ N1 per-part uncertainty'),
+           ('+ occlusion-aware uncertainty (full model, ours)', '+ occlusion-aware calibration (ours)')]
 
 
 def relabel(s):
@@ -149,18 +160,24 @@ def relabel(s):
     return s
 
 
+def hdr(top, bottom):
+    """Two-line column header."""
+    return '\\begin{tabular}[b]{@{}c@{}}' + top + '\\\\' + bottom + '\\end{tabular}'
+
+
 def t_ladder():
     write('t_ladder', relabel(md_table_to_tex(
-        'results/phase4_ladder.md', '| Row |', 'llrccccccc', drop_cols=(5, 9, 11),
-        rename=['', 'Model', 'Params', 'FG-CV', 'FG-CV CL', 'Corrupted enr.', 'Occluded probes',
-                'OS AUROC NM', 'OS DIR@1% NM', 'Expl. sep.'])))
+        'results/phase4_ladder.md', '| Row |', '@{}llrccccccc@{}', drop_cols=(5, 9, 11),
+        rename=['', 'Model', 'Params', hdr('FG-CV', 'mean'), hdr('FG-CV', 'CL'), hdr('Corrupted', 'enroll.'),
+                hdr('Occluded', 'probes'), hdr('AUROC', 'NM'), hdr('DIR@1%', 'NM'), hdr('Expl.', 'sep.')])))
 
 
 def t_heads():
     write('t_heads', relabel(md_table_to_tex(
-        'results/phase5_tables.md', '| Head |', 'lrcccccccc',
-        rename=['Head', 'Params', 'FG-CV', 'FG-CV CL', 'Corrupted enr.', 'Occluded probes',
-                'OS AUROC NM', 'OS AUROC CL', 'OS DIR@1% NM', 'OS OSCR occl.'])))
+        'results/phase5_tables.md', '| Head |', '@{}lrcccccccc@{}',
+        rename=['Head', 'Params', hdr('FG-CV', 'mean'), hdr('FG-CV', 'CL'), hdr('Corrupted', 'enroll.'),
+                hdr('Occluded', 'probes'), hdr('AUROC', 'NM'), hdr('AUROC', 'CL'), hdr('DIR@1%', 'NM'),
+                hdr('OSCR', 'occl.')])))
 
 
 def t_attention():
@@ -179,9 +196,10 @@ def t_attention():
 
 def t_faithfulness():
     S = J('results/p4d_interpret/summary.json')
-    names = {'attention': 'Attention baseline (L0)', 'b1': 'B1 (uniform)', 'n1n2': 'B1 + reliability head'}
-    L = ['\\begin{tabular}{llccccc}', '\\toprule',
-         'Model & Probe & Random & Contrib. & Weights & Least-first & Separation \\\\', '\\midrule']
+    names = {'attention': 'Attention (L0)', 'b1': 'B1', 'n1n2': 'B1 + head'}
+    L = ['\\begin{tabular}{@{}llccccc@{}}', '\\toprule',
+         ' & & & \\multicolumn{3}{c}{Gain over random} & \\\\', '\\cmidrule(lr){4-6}',
+         'Model & Probe & Random & Margin & Weights & Least & Sep. \\\\', '\\midrule']
     for k in ['attention', 'b1', 'n1n2']:
         for c in C3:
             s = S[k][c]
@@ -197,13 +215,14 @@ def t_faithfulness():
 def t_uncertainty():
     S = J('results/p4_2stage_occ/uncertainty_validation.json')['summary']
     parts = ['head', 'shoulders', 'upper torso', 'lower torso', 'pelvis', 'thighs', 'calves', 'feet']
-    L = ['\\begin{tabular}{l' + 'c' * 8 + '}', '\\toprule', 'Statistic & ' + ' & '.join(p.title() for p in parts) + ' \\\\',
-         '\\midrule']
-    for label, key, fmt in [('Variance ratio CL/NM', 'ratio_cl_nm', '{:.2f}'), ('Variance ratio BG/NM', 'ratio_bg_nm', '{:.2f}'),
-                            ('Spearman($s$, error)', 'spearman_var_vs_error', '{:.2f}'),
-                            ('Blank this strip: own var.\\ $\\times$', 'occlusion_self_ratio', '{:.1f}'),
-                            ('\\quad other strips $\\times$', 'occlusion_other_ratio', '{:.2f}')]:
-        L.append(label + ' & ' + ' & '.join(fmt.format(S[key][p]['mean']) for p in parts) + ' \\\\')
+    cols = [('ratio_cl_nm', '{:.2f}'), ('ratio_bg_nm', '{:.2f}'), ('spearman_var_vs_error', '{:.2f}'),
+            ('occlusion_self_ratio', '{:.1f}'), ('occlusion_other_ratio', '{:.2f}')]
+    L = ['\\begin{tabular}{@{}lccccc@{}}', '\\toprule',
+         ' & \\multicolumn{2}{c}{Variance ratio} & Spearman & \\multicolumn{2}{c}{Strip blanked: var.\\ $\\times$} \\\\',
+         '\\cmidrule(lr){2-3}\\cmidrule(lr){5-6}',
+         'Part & CL/NM & BG/NM & $\\rho(s,\\text{error})$ & own & others \\\\', '\\midrule']
+    for p in parts:                                          # transposed: one row per body part
+        L.append(p.capitalize() + ' & ' + ' & '.join(fmt.format(S[key][p]['mean']) for key, fmt in cols) + ' \\\\')
     L += ['\\bottomrule', '\\end{tabular}']
     write('t_uncertainty', '\n'.join(L) + '\n')
 
@@ -217,33 +236,6 @@ def frozen_occ_types():
         if bb not in X and len(H[bb]) == 2:
             X[bb] = {f: {'frozen': d['frozen'], 'head': d['head']} for f, d in H[bb].items()}
     return X
-
-
-def t_frozen_types():
-    p = 'results/p5_plugin/final_occ_types.json'
-    if not os.path.exists(p):
-        print('t_frozen_types: results pending'); return
-    X = frozen_occ_types()
-    types = [('clean', 'Clean'), ('hband', 'Horizontal band$^\\dagger$'), ('bottom', 'Lower body'),
-             ('vband', 'Vertical band'), ('noise', 'Segmentation noise')]
-    bbs = [b for b in FROZEN_BBS if b[0] in X]
-    L = ['\\begin{tabular}{l' + 'ccc' * len(bbs) + '}', '\\toprule',
-         ' & ' + ' & '.join(f'\\multicolumn{{3}}{{c}}{{{n}}}' for _, n, _ in bbs) + ' \\\\',
-         ''.join(f'\\cmidrule(lr){{{2 + 3 * i}-{4 + 3 * i}}}' for i in range(len(bbs))),
-         'Probe corruption' + ' & Frozen & +Head & Wins' * len(bbs) + ' \\\\', '\\midrule']
-    for t, label in types:
-        cells = []
-        for bb, _, _ in bbs:
-            fr, hv, w = [], [], 0
-            for f, d in X[bb].items():
-                fr.append(d['frozen'][t])
-                for s, r in d['head'].items():
-                    hv.append(r[t]); w += r[t] > d['frozen'][t]
-            a, b = np.mean(fr), np.mean(hv)
-            cells += [f'{a:.2f}', (f'\\textbf{{{b:.2f}}}' if b - a >= 0.5 else f'{b:.2f}'), f'{w}/{len(hv)}']
-        L.append(f'{label} & ' + ' & '.join(cells) + ' \\\\')
-    L += ['\\bottomrule', '\\end{tabular}']
-    write('t_frozen_types', '\n'.join(L) + '\n')
 
 
 def t_robust_baselines():
@@ -276,36 +268,6 @@ def t_robust_baselines():
     write('t_robust_baselines', '\n'.join(L) + '\n')
 
 
-def t_frozen_hybrid():
-    p = 'results/p5_plugin/frozen_hybrid.json'
-    if not os.path.exists(p):
-        print('t_frozen_hybrid: results pending'); return
-    X = J(p)
-    bbs = [(b, n) for b, n, _ in FROZEN_BBS if len(X.get(b, {})) == 2]
-    scen = [('clean', 'Clean'), ('corrupt_enroll', 'Corr.\\ enroll.'), ('hband', 'H.\\ band$^\\dagger$'),
-            ('bottom', 'Lower body'), ('vband', 'V.\\ band'), ('noise', 'Noise')]
-    kinds = [('frozen', 'Frozen'), ('energy', 'Energy mask'), ('head', 'Head'), ('hybrid', 'Head + energy')]
-    L = ['\\begin{tabular}{ll' + 'c' * len(scen) + '}', '\\toprule',
-         'Backbone & Scorer & ' + ' & '.join(l for _, l in scen) + ' \\\\']
-    for bb, name in bbs:
-        mean = {}
-        for k, _ in kinds:
-            for sc, _ in scen:
-                v = [x for d in X[bb].values()
-                     for x in ([d[k][sc]] if k in ('frozen', 'energy') else [r[sc] for r in d[k].values()])]
-                mean[k, sc] = round(float(np.mean(v)), 1)
-        L.append('\\midrule')
-        for i, (k, label) in enumerate(kinds):
-            cells = []
-            for sc, _ in scen:
-                col = [mean[kk, sc] for kk, _ in kinds]
-                bold = max(col) - min(col) >= 0.5 and mean[k, sc] == max(col)
-                cells.append(f'\\textbf{{{mean[k, sc]:.1f}}}' if bold else f'{mean[k, sc]:.1f}')
-            L.append(f"{name if i == 0 else ''} & {label} & " + ' & '.join(cells) + ' \\\\')
-    L += ['\\bottomrule', '\\end{tabular}']
-    write('t_frozen_hybrid', '\n'.join(L) + '\n')
-
-
 def wdist_runs(bb, X=None):
     """Per-run rows of frozen_wdist.json: frozen, likelihood head and weighted distance at the calibrated gamma."""
     X = X or J('results/p5_plugin/frozen_wdist.json')
@@ -317,36 +279,50 @@ def wdist_runs(bb, X=None):
     return out
 
 
-def t_frozen_wdist():
-    p = 'results/p5_plugin/frozen_wdist.json'
-    if not os.path.exists(p):
-        print('t_frozen_wdist: results pending'); return
-    X = J(p)
-    bbs = [(b, n) for b, n, _ in FROZEN_BBS if len(X.get(b, {})) == 2]
+def t_frozen_scorers():
+    """All scorers on the frozen checkpoints in one table (merged former t_frozen_hybrid and t_frozen_wdist).
+    Frozen, likelihood head and weighted distance (calibrated gamma) from frozen_wdist.json (all scenarios);
+    energy mask and head + energy from frozen_hybrid.json (no CL / mismatched-gallery scenarios: '--')."""
+    pw, ph = 'results/p5_plugin/frozen_wdist.json', 'results/p5_plugin/frozen_hybrid.json'
+    if not (os.path.exists(pw) and os.path.exists(ph)):
+        print('t_frozen_scorers: results pending'); return
+    W, H = J(pw), J(ph)
+    bbs = [(b, n) for b, n, _ in FROZEN_BBS if len(W.get(b, {})) == 2 and len(H.get(b, {})) == 2]
     scen = [('clean', 'Clean'), ('cl', 'CL'), ('mismatch', 'Mism.'), ('corrupt_enroll', 'Corr.\\ enroll.'),
             ('hband', 'H.\\ band$^\\dagger$'), ('bottom', 'Lower body'), ('vband', 'V.\\ band'), ('noise', 'Noise')]
     L = ['\\begin{tabular}{ll' + 'c' * len(scen) + '}', '\\toprule',
          'Backbone & Scorer & ' + ' & '.join(l for _, l in scen) + ' \\\\']
     for bb, name in bbs:
-        R = wdist_runs(bb, X)
+        R = wdist_runs(bb, W)
         gam = sorted({r['gamma'] for r in R})
-        kinds = [('frozen', 'Frozen'), ('head', 'Likelihood head'),
-                 ('wd', 'Weighted distance ($\\hat\\gamma\\in\\{' + ','.join(f'{g:g}' for g in gam) + '\\}$)'
-                  if len(gam) > 1 else f'Weighted distance ($\\hat\\gamma={gam[0]:g}$)')]
-        mean = {(k, sc): round(float(np.mean([r[k][sc] for r in R])), 1) for k, _ in kinds for sc, _ in scen}
+        g = ('\\in\\{' + ','.join(f'{x:g}' for x in gam) + '\\}') if len(gam) > 1 else f'={gam[0]:g}'
+        kinds = [('frozen', 'Frozen'), ('energy', 'Energy mask'), ('head', 'Likelihood head (ours)'),
+                 ('hybrid', 'Head + energy (ours)'), ('wd', f'Weighted distance (ours), $\\hat\\gamma{g}$')]
+        mean = {}
+        for k in ['frozen', 'head', 'wd']:
+            for sc, _ in scen:
+                mean[k, sc] = round(float(np.mean([r[k][sc] for r in R])), 1)
+        for k in ['energy', 'hybrid']:
+            for sc, _ in scen:
+                v = [x for d in H[bb].values() if sc in d['frozen']
+                     for x in ([d[k][sc]] if k == 'energy' else [r[sc] for r in d[k].values()])]
+                mean[k, sc] = round(float(np.mean(v)), 1) if v else None
         L.append('\\midrule')
         for i, (k, label) in enumerate(kinds):
             cells = []
             for sc, _ in scen:
-                col = [mean[kk, sc] for kk, _ in kinds]
-                bold = max(col) - min(col) >= 0.5 and mean[k, sc] == max(col)
-                cells.append(f'\\textbf{{{mean[k, sc]:.1f}}}' if bold else f'{mean[k, sc]:.1f}')
+                col = [mean[kk, sc] for kk, _ in kinds if mean[kk, sc] is not None]
+                x = mean[k, sc]
+                if x is None:
+                    cells.append('--'); continue
+                bold = max(col) - min(col) >= 0.5 and x == max(col)
+                cells.append(f'\\textbf{{{x:.1f}}}' if bold else f'{x:.1f}')
             L.append(f"{name if i == 0 else ''} & {label} & " + ' & '.join(cells) + ' \\\\')
     L += ['\\bottomrule', '\\end{tabular}']
-    write('t_frozen_wdist', '\n'.join(L) + '\n')
+    write('t_frozen_scorers', '\n'.join(L) + '\n')
 
 
 if __name__ == '__main__':
-    for f in [t_multidataset, t_frozen, t_ladder, t_heads, t_attention, t_faithfulness, t_uncertainty, t_frozen_types,
-              t_robust_baselines, t_frozen_hybrid, t_frozen_wdist]:
+    for f in [t_multidataset, t_frozen, t_ladder, t_heads, t_attention, t_faithfulness, t_uncertainty,
+              t_robust_baselines, t_frozen_scorers]:
         f()

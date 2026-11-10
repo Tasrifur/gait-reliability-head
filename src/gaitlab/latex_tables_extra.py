@@ -20,9 +20,9 @@ def t_datasets():
     from .calibrate import load_dataset
     from .multi_eval import protocol
     meta = {'casiab': ('CASIA-B', 'NM, BG, CL', 'NM-01--04', 'NM-05/06, BG, CL'),
-            'casiae': ('CASIA-E', 'NM, BG, CL, 3 scenes', 'scene 1 NM, H+L', 'scenes 2/3'),
-            'oumvlp': ('OU-MVLP', 'NM', 'seq. 01', 'seq. 00')}
-    rows = []
+            'casiae': ('CASIA-E', 'NM, BG, CL; 3 scenes', 'scene 1 NM, H+L', 'scenes 2, 3'),
+            'oumvlp': ('OU-MVLP', 'NM', 'seq.\\ 01', 'seq.\\ 00')}
+    col = {}
     for k in ['casiab', 'casiae', 'oumvlp']:
         ds, sp, _, _, _ = load_dataset(k)
         g, pr, _ = protocol(k, ds)
@@ -32,11 +32,18 @@ def t_datasets():
         ng = int(ds.valid[np.ix_(sp['test'], gq, range(len(ds.views)))].sum())
         npb = int(ds.valid[np.ix_(sp['test'], pq, range(len(ds.views)))].sum())
         n, cond, gal, prb = meta[k]
-        rows.append(f"{n} & {len(ds.subjects):,} & {len(ds.views)} & {cond} & {len(sp['train']):,} & "
-                    f"{len(sp['val'])} & {len(sp['test']):,} & {gal} & {prb} & {ng:,} & {npb:,} \\\\")
-    L = [r'\begin{tabular}{lrrlrrrllrr}', r'\toprule',
-         r'Dataset & IDs & Views & Conditions & Train & Calib. & Test & Gallery & Probes & \#Gallery & \#Probes \\',
-         r'\midrule'] + rows + [r'\bottomrule', r'\end{tabular}']
+        col[k] = [n, f'{len(ds.subjects):,}', f'{len(ds.views)}', cond, f"{len(sp['train']):,}", f"{len(sp['val'])}",
+                  f"{len(sp['test']):,}", gal, prb, f'{ng:,}', f'{npb:,}']
+    labels = [None, 'Identities', 'Views', 'Conditions', 'Training IDs', 'Calibration IDs', 'Test IDs',
+              'Gallery', 'Probes', 'Gallery samples', 'Probe samples']
+    c = r'>{\centering\arraybackslash}p{0.21\columnwidth}'
+    L = [r'\begin{tabular}{@{}l' + c * 3 + '@{}}', r'\toprule',          # transposed: one column per dataset
+         ' & ' + ' & '.join(col[k][0] for k in col) + r' \\', r'\midrule']
+    for i, lab in enumerate(labels[1:], 1):
+        if i in (4, 7, 9):
+            L.append(r'\midrule')
+        L.append(f'{lab} & ' + ' & '.join(col[k][i] for k in col) + r' \\')
+    L += [r'\bottomrule', r'\end{tabular}']
     write('t_datasets', '\n'.join(L) + '\n')
 
 
@@ -61,12 +68,13 @@ def t_reproduction():
 def t_complexity():
     A = J('results/paper_analyses.json')
     T = A['timing']
-    L = [r'\begin{tabular}{lrcc}', r'\toprule',
-         r'Model & Parameters & Enrollment (ms/identity, $K{=}4$) & Matching (ms/probe, 50 IDs) \\', r'\midrule']
-    for k, lab in [('B1', 'Compact backbone (B1)'), ('B1+head', 'B1 + reliability head')]:
+    L = [r'\begin{tabular}{@{}lrcc@{}}', r'\toprule',
+         r'Model & Params & Enroll (ms) & Match (ms) \\', r'\midrule']
+    for k, lab in [('B1', 'B1 backbone'), ('B1+head', 'B1 + head')]:
         L.append(f"{lab} & {T[k]['params']:,} & {T[k]['enroll_ms_per_identity_K4']:.2f} & "
                  f"{T[k]['match_ms_per_probe_50way']:.2f}" + r' \\')
-    L += [r'\midrule', r'Head on GaitPart, GaitGL / GaitSet, GaitBase & +8.4k / +16.5k & \multicolumn{2}{c}{$<$1\% of backbone parameters} \\',
+    L += [r'\midrule', r'Head on GaitPart, GaitGL & +8.4k & \multicolumn{2}{c}{$<$1\% of backbone} \\',
+          r'Head on GaitSet, GaitBase & +16.5k & \multicolumn{2}{c}{$<$1\% of backbone} \\',
           r'\bottomrule', r'\end{tabular}']
     write('t_complexity', '\n'.join(L) + '\n')
 
@@ -91,56 +99,82 @@ $\tau$ & open-set acceptance threshold \\
 \end{tabular}
 """
 
-T_HPARAMS = r"""\begin{tabular}{lll}
+T_HPARAMS = r"""\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.6\columnwidth}@{}}
 \toprule
-Component & Hyperparameter & Value \\
+Hyperparameter & Value \\
 \midrule
-Compact backbone (B1) & architecture & 3 conv.\ blocks (32/64/128 ch.) with BN, $P=8$, $D=128$ \\
- & episodes & 20-way, 4-shot, 5 queries, cross-view, $\leq$8{,}000 \\
- & optimiser & Adam, lr $10^{-3}$, wd $10^{-5}$, cosine schedule, clip 1.0 \\
- & per-part auxiliary loss weight & 1.0 \\
- & early stopping & every 200 episodes, patience 12 \\
+\multicolumn{2}{@{}l}{\textit{Compact backbone (B1)}} \\
+\quad architecture & 3 conv.\ blocks (32/64/128 ch.) with BN; $P=8$, $D=128$ \\
+\quad episodes & 20-way, 4-shot, 5 queries, cross-view, $\leq$8{,}000 \\
+\quad optimiser & Adam, lr $10^{-3}$, wd $10^{-5}$, cosine schedule, clip 1.0 \\
+\quad auxiliary loss weight & 1.0 (per part) \\
+\quad early stopping & every 200 episodes, patience 12 \\
 \midrule
-Reliability head & architecture & MLP $2D\!\to\!64\!\to\!1$, shared, + per-part bias \\
- & variance & softplus, floor $10^{-3}$, initial value 4 \\
- & calibration & 3{,}000 episodes, $N=\min(20,|\mathcal{C}|-2)$, $K=4$, 5 probes \\
- & optimiser & Adam, lr $10^{-3}$ \\
- & occlusion-aware sampling & horizontal band, 6--16 rows, $p=0.5$ \\
+\multicolumn{2}{@{}l}{\textit{Reliability head}} \\
+\quad architecture & MLP $2D\!\to\!64\!\to\!1$, shared, + per-part bias \\
+\quad variance & softplus, floor $10^{-3}$, initial value 4 \\
+\quad calibration & 3{,}000 episodes, $N=\min(20,|\mathcal{C}|-2)$, $K=4$, 5 probes \\
+\quad optimiser & Adam, lr $10^{-3}$ \\
+\quad occlusion sampling & horizontal band, 6--16 rows, $p=0.5$ \\
 \midrule
-Evaluation & seeds & 5 (CASIA-B), 3 (CASIA-E, OU-MVLP) \\
- & open-set splits & 10 / 5 / 2, half of the test identities enrolled \\
+\multicolumn{2}{@{}l}{\textit{Evaluation}} \\
+\quad seeds & 5 (CASIA-B), 3 (CASIA-E, OU-MVLP) \\
+\quad open-set splits & 10 / 5 / 2; half of the test identities enrolled \\
 \bottomrule
 \end{tabular}
 """
 
-T_POSITIONING = r"""\begin{tabular}{lcccccc}
+# Representative related work (Table 1). Every entry was checked against the publisher record (Crossref / DOI)
+# and the paper's abstract or full text; attributes follow what the papers state.
+T_LITERATURE = r"""\begin{tabular}{@{}llllccccc@{}}
 \toprule
-Approach & Frozen & Per- & Pair- & Calibrated & Open-set & Exact \\
- & backbone & part & dependent & uncertainty & score & explanation \\
+Method & Venue & Year & Input & \begin{tabular}[b]{@{}c@{}}Frozen\\backbone\end{tabular} & Occlusion & Reliability & \begin{tabular}[b]{@{}c@{}}Open-set\\rejection\end{tabular} & Explanation \\
 \midrule
-Part-based gait models~\cite{chao2019gaitset,fan2020gaitpart,fan2023opengait} & -- & \checkmark & -- & -- & -- & -- \\
-Adaptive region weighting~\cite{p14,p18} & -- & \checkmark & -- & -- & -- & -- \\
-Few-shot metric heads~\cite{snell2017prototypical,oreshkin2018tadam,ye2020feat} & -- & -- & partly & -- & -- & -- \\
-Probabilistic face embeddings~\cite{shi2019pfe,chang2020dul} & \checkmark & -- & \checkmark & \checkmark & -- & -- \\
+\multicolumn{9}{@{}l}{\textit{Gait recognition models}} \\
+GaitGL~\cite{lin2021gaitgl} & ICCV & 2021 & silh. & -- & -- & -- & -- & -- \\
+GaitBase~\cite{fan2023opengait} & CVPR & 2023 & silh. & -- & -- & -- & -- & -- \\
+ParsingGait~\cite{zheng2023parsing} & ACM MM & 2023 & parsing & -- & $\circ$ & -- & -- & -- \\
+SkeletonGait~\cite{fan2024skeletongait} & AAAI & 2024 & skeleton & -- & $\circ$ & -- & -- & -- \\
+BigGait~\cite{ye2024biggait} & CVPR & 2024 & RGB & $\circ$ & -- & -- & -- & $\circ$ \\
+VPNet~\cite{ma2024visualprompt} & CVPR & 2024 & silh. & -- & $\circ$ & -- & -- & $\circ$ \\
+XGait~\cite{zheng2024xgait} & ACM MM & 2024 & silh.\ + parsing & -- & $\circ$ & -- & -- & $\circ$ \\
 \midrule
-\textbf{Ours} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+\multicolumn{9}{@{}l}{\textit{Quality and uncertainty}} \\
+PFE~\cite{shi2019pfe} & ICCV & 2019 & face & \checkmark & -- & per sample & -- & -- \\
+PUCNN~\cite{sun2021pucnn} & ICIP & 2021 & person image & -- & -- & per part & -- & -- \\
+UAL~\cite{dou2022ual} & ECCV & 2022 & person image & -- & -- & per sample & \checkmark & -- \\
+GQAN~\cite{hou2023gqan} & TNNLS & 2023 & silh. & -- & -- & part quality & -- & \checkmark \\
+QAGait~\cite{wang2024qagait} & AAAI & 2024 & silh. & -- & -- & sequence quality & -- & -- \\
+\midrule
+\multicolumn{9}{@{}l}{\textit{Occlusion-robust gait recognition}} \\
+Occlusion-type aware~\cite{gupta2024occlusion} & WACV & 2024 & video & -- & \checkmark & -- & -- & -- \\
+GaitMoE~\cite{huang2024gaitmoe} & ECCV & 2024 & silh. & -- & \checkmark & -- & -- & $\circ$ \\
+BGaitR-Net~\cite{kumar2024bgaitr} & ESWA & 2024 & silh. & -- & \checkmark & -- & -- & -- \\
+ODR~\cite{hasan2024odr} & IEEE Access & 2024 & silh. & -- & \checkmark & -- & -- & -- \\
+RG-Gait~\cite{gupta2025mindgap} & IJCB & 2025 & silh. & -- & \checkmark & occlusion score & -- & -- \\
+\midrule
+\multicolumn{9}{@{}l}{\textit{Open-set operation}} \\
+Open-set losses~\cite{su2025openset} & ECCV & 2024 & face, gait, body & -- & -- & -- & \checkmark & -- \\
+SetTransformer enrollment~\cite{basoc2025enrollment} & FG & 2026 & skeleton & \checkmark & -- & -- & \checkmark & -- \\
+\midrule
+\textbf{Ours} & & & silh., GEI & \checkmark & \checkmark & per part, pair-dependent & \checkmark & \checkmark \\
 \bottomrule
 \end{tabular}
 """
 
 
-T_GUIDANCE = r"""\begin{tabular}{lll}
+T_GUIDANCE = r"""\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.33\columnwidth}>{\raggedright\arraybackslash}p{0.4\columnwidth}>{\raggedright\arraybackslash}p{0.21\columnwidth}@{}}
 \toprule
 Operating condition & Component & Evidence \\
 \midrule
 Probes partly occluded & per-part likelihood (N1) & Tables~\ref{tab:multi}, \ref{tab:baselines} \\
 Enrollment walks partly occluded & precision-weighted enrollment (N2), $K>1$ & Fig.~\ref{fig:severity}, Remark~\ref{rem:reject} \\
 Body regions leaving the field of view & silhouette-energy prior (Eq.~\ref{eq:hybrid}) & Table~\ref{tab:baselines} \\
-Frozen backbone, occlusion-heavy site & precision-weighted backbone distance (Eq.~\ref{eq:wdist}) & Table~\ref{tab:frozenwdist} \\
+Frozen backbone, occlusion-heavy site & precision-weighted backbone distance (Eq.~\ref{eq:wdist}) & Table~\ref{tab:frozenscorers} \\
 Clothing and carrying covariates & per-part likelihood (N1) & Tables~\ref{tab:multi}, \ref{tab:frozen} \\
 Unknown walkers & likelihood-based rejection (N4) & Fig.~\ref{fig:dirfar}, Table~\ref{tab:frozen} \\
 Auditing a decision & margin decomposition (Eqs.~\ref{eq:margin}, \ref{eq:margin_split}) & Table~\ref{tab:faith} \\
-Existing deployed backbone & plug-in head, no retraining & Tables~\ref{tab:frozen}, \ref{tab:frozentypes} \\
+Existing deployed backbone & plug-in head, no retraining & Tables~\ref{tab:frozen}, \ref{tab:frozenscorers} \\
 \bottomrule
 \end{tabular}
 """
@@ -150,7 +184,7 @@ def t_static():
     write('t_guidance', T_GUIDANCE)
     write('t_notation', T_NOTATION)
     write('t_hparams', T_HPARAMS)
-    write('t_positioning', T_POSITIONING)
+    write('t_literature', T_LITERATURE)
 
 
 # ------------------------------------------------------------------ figures
@@ -158,7 +192,9 @@ def _style():
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    plt.rcParams.update({'font.size': 7.5, 'axes.titlesize': 8, 'axes.labelsize': 7.5, 'legend.fontsize': 6.5,
+    plt.rcParams.update({'font.family': 'serif', 'font.serif': ['Times New Roman', 'Times', 'DejaVu Serif'],
+                         'mathtext.fontset': 'stix',                     # Times-compatible math
+                         'font.size': 7.5, 'axes.titlesize': 8, 'axes.labelsize': 7.5, 'legend.fontsize': 6.5,
                          'xtick.labelsize': 6.5, 'ytick.labelsize': 6.5, 'axes.linewidth': 0.6,
                          'lines.linewidth': 1.2, 'lines.markersize': 3.5, 'grid.linewidth': 0.4,
                          'axes.spines.top': False, 'axes.spines.right': False, 'axes.grid': True,
@@ -188,15 +224,21 @@ def _agg(R, key):
 def f_per_view():
     plt = _style()
     R = J('results/paper_analyses.json')['per_view']
-    fig, ax = plt.subplots(1, 4, figsize=(FULL, 2.0), sharey=False)
-    for a, (k, t) in zip(ax, [('nm', 'NM probes'), ('bg', 'BG probes'), ('cl', 'CL probes'), ('nm_occ', 'Occluded NM probes')]):
+    fig, ax = plt.subplots(2, 2, figsize=(HALF, 3.2))          # one-column 2 x 2 layout
+    ax = ax.ravel()
+    for j, (a, (k, t)) in enumerate(zip(ax, [('nm', 'NM probes'), ('bg', 'BG probes'), ('cl', 'CL probes'),
+                                              ('nm_occ', 'Occluded NM probes')])):
         b = np.array([R[f'b1/{s}'][k] for s in range(5)]); h = np.array([R[f'head/{s}'][k] for s in range(5)])
         x = np.arange(11)
         for arr, lab, c, m in [(b, 'B1', COL['b1'], 's'), (h, 'B1 + head', COL['head'], 'o')]:
-            a.plot(x, arr.mean(0), marker=m, ms=2.5, color=c, label=lab)
+            a.plot(x, arr.mean(0), marker=m, ms=2.2, color=c, label=lab)
             a.fill_between(x, arr.min(0), arr.max(0), color=c, alpha=0.15, lw=0)
-        a.set_xticks(x[::2]); a.set_xticklabels(VIEWS[::2]); a.set_title(t); a.set_xlabel('probe view (deg)')
-    ax[0].set_ylabel('rank-1 (%)'); ax[0].legend(loc='lower center')
+        a.set_xticks(x[::2]); a.set_xticklabels(VIEWS[::2]); a.set_title(t)
+        if j >= 2:
+            a.set_xlabel('probe view (deg)')
+        if j % 2 == 0:
+            a.set_ylabel('rank-1 (%)')
+    ax[0].legend(loc='lower center')
     plt.tight_layout(); plt.savefig(f'{FIG}/per_view.pdf'); plt.close()
 
 
@@ -227,13 +269,14 @@ def f_severity():
 def f_dirfar():
     plt = _style()
     D = J('results/paper_analyses.json')['dirfar']
-    fig, ax = plt.subplots(1, 3, figsize=(FULL, 2.1), sharey=True)
+    fig, ax = plt.subplots(3, 1, figsize=(HALF, 3.3), sharex=True)        # one column, panels stacked
     for a, (m, t) in zip(ax, [('nm', 'NM probes'), ('cl', 'CL probes'), ('nm_occ', 'Occluded NM probes')]):
         for kind, lab in [('b1', 'B1'), ('head', 'B1 + head')]:
             fa, dr = D[kind][m]
             a.plot(np.array(fa) * 100, np.array(dr) * 100, color=COL[kind], label=lab, lw=1.4)
-        a.set_xscale('log'); a.set_xlabel('false alarm rate (%)'); a.set_title(t)
-    ax[0].set_ylabel('DIR (%)'); ax[0].legend(loc='upper left')
+        a.set_xscale('log'); a.set_ylabel('DIR (%)')
+        a.text(0.02, 0.93, t, transform=a.transAxes, va='top', fontsize=7.5)
+    ax[-1].set_xlabel('false alarm rate (%)'); ax[0].legend(loc='lower right')
     plt.tight_layout(); plt.savefig(f'{FIG}/dirfar.pdf'); plt.close()
 
 
@@ -300,7 +343,7 @@ def f_attention_bars():
     plt = _style()
     rows = [('Uniform', 'abl_cv_uniform'), ('Global', 'abl_cv_global'), ('Query', 'abl_cv_query'),
             ('[q; c̄]', 'abl_cv_concat'), ('Residual', 'v0_dppnet_lt_cv')]
-    fig, a = plt.subplots(1, 1, figsize=(HALF, 2.3))
+    fig, a = plt.subplots(1, 1, figsize=(HALF, 2.2))
     x = np.arange(len(rows)); w = 0.26
     for j, (c, col) in enumerate([('nm', INDIGO), ('bg', PERIWINKLE), ('cl', AMBER)]):
         v = [J(f'results/{r}/summary.json')['evals']['full_gallery_cv'][c] for _, r in rows]
