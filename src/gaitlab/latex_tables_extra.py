@@ -158,12 +158,22 @@ def _style():
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    plt.rcParams.update({'font.size': 9, 'axes.spines.top': False, 'axes.spines.right': False,
-                         'axes.grid': True, 'grid.alpha': 0.3, 'legend.frameon': False})
+    plt.rcParams.update({'font.size': 7.5, 'axes.titlesize': 8, 'axes.labelsize': 7.5, 'legend.fontsize': 6.5,
+                         'xtick.labelsize': 6.5, 'ytick.labelsize': 6.5, 'axes.linewidth': 0.6,
+                         'lines.linewidth': 1.2, 'lines.markersize': 3.5, 'grid.linewidth': 0.4,
+                         'axes.spines.top': False, 'axes.spines.right': False, 'axes.grid': True,
+                         'grid.alpha': 0.3, 'legend.frameon': False,
+                         'pdf.fonttype': 42, 'ps.fonttype': 42,          # embed TrueType fonts (no Type 3)
+                         'savefig.bbox': 'tight', 'savefig.pad_inches': 0.02,
+                         'savefig.dpi': 600})                            # raster parts (GEIs) at 600 dpi
     return plt
 
 
-COL = {'b1': '#7f7f7f', 'head': '#1f77b4', 'frozen': '#7f7f7f'}
+# Paper palette: cool colors for baselines and conditions, warm colors for the proposed methods.
+INDIGO, PERIWINKLE, AMBER, ORANGE, FLAME = '#3d348b', '#7678ed', '#f7b801', '#f18701', '#f35b04'
+LAVENDER = '#bcbdf6'                                     # tint of PERIWINKLE, only where a 6th category is needed
+COL = {'b1': INDIGO, 'head': FLAME, 'frozen': INDIGO}
+FULL, HALF = 7.1, 3.45       # two-column elsarticle (5p): text width and column width, inches
 VIEWS = ['0', '18', '36', '54', '72', '90', '108', '126', '144', '162', '180']
 
 
@@ -178,14 +188,14 @@ def _agg(R, key):
 def f_per_view():
     plt = _style()
     R = J('results/paper_analyses.json')['per_view']
-    fig, ax = plt.subplots(1, 4, figsize=(12, 2.8), sharey=False)
+    fig, ax = plt.subplots(1, 4, figsize=(FULL, 2.0), sharey=False)
     for a, (k, t) in zip(ax, [('nm', 'NM probes'), ('bg', 'BG probes'), ('cl', 'CL probes'), ('nm_occ', 'Occluded NM probes')]):
         b = np.array([R[f'b1/{s}'][k] for s in range(5)]); h = np.array([R[f'head/{s}'][k] for s in range(5)])
         x = np.arange(11)
         for arr, lab, c, m in [(b, 'B1', COL['b1'], 's'), (h, 'B1 + head', COL['head'], 'o')]:
-            a.plot(x, arr.mean(0), marker=m, ms=3.5, color=c, label=lab)
+            a.plot(x, arr.mean(0), marker=m, ms=2.5, color=c, label=lab)
             a.fill_between(x, arr.min(0), arr.max(0), color=c, alpha=0.15, lw=0)
-        a.set_xticks(x); a.set_xticklabels(VIEWS, fontsize=7); a.set_title(t); a.set_xlabel('probe view (deg)')
+        a.set_xticks(x[::2]); a.set_xticklabels(VIEWS[::2]); a.set_title(t); a.set_xlabel('probe view (deg)')
     ax[0].set_ylabel('rank-1 (%)'); ax[0].legend(loc='lower center')
     plt.tight_layout(); plt.savefig(f'{FIG}/per_view.pdf'); plt.close()
 
@@ -193,7 +203,7 @@ def f_per_view():
 def f_severity():
     plt = _style()
     A = J('results/paper_analyses.json')
-    fig, ax = plt.subplots(1, 3, figsize=(11, 2.9))
+    fig, ax = plt.subplots(1, 3, figsize=(FULL, 2.2))
     for a, (sec, xs, xl, t) in zip(ax[:2], [('enroll_sweep', ['0.0', '0.25', '0.5', '0.75', '1.0'],
                                              'fraction of occluded enrollment samples', '(a) Corrupted enrollment'),
                                             ('probe_sweep', ['0', '8', '16', '24', '32'],
@@ -202,38 +212,38 @@ def f_severity():
         for kind, lab, m in [('b1', 'B1', 's'), ('head', 'B1 + head', 'o')]:
             arr = np.array([[R[f'{kind}/{s}'][x] for x in xs] for s in range(5)])
             xv = [float(x) for x in xs]
-            a.errorbar(xv, arr.mean(0), yerr=arr.std(0), marker=m, ms=4, capsize=2, color=COL[kind], label=lab)
+            a.errorbar(xv, arr.mean(0), yerr=arr.std(0), marker=m, ms=3, capsize=1.5, color=COL[kind], label=lab)
         a.set_xlabel(xl); a.set_title(t)
     ax[0].set_ylabel('rank-1 (%)'); ax[0].legend()
     R = A['kshot']; a = ax[2]
     for kind, lab, c in [('b1', 'B1', COL['b1']), ('head', 'B1 + head', COL['head'])]:
         for g, ls, m in [('clean', '-', 'o'), ('corrupt', '--', '^')]:
             arr = np.array([[R[f'{kind}/{s}'][f'{g}/K{k}'] for k in [1, 2, 3, 4]] for s in range(5)])
-            a.plot([1, 2, 3, 4], arr.mean(0), ls=ls, marker=m, ms=4, color=c, label=f'{lab}, {g}')
-    a.set_xticks([1, 2, 3, 4]); a.set_xlabel('enrollment samples $K$'); a.set_title('(c) Enrollment size'); a.legend(fontsize=7)
+            a.plot([1, 2, 3, 4], arr.mean(0), ls=ls, marker=m, ms=3, color=c, label=f'{lab}, {g}')
+    a.set_xticks([1, 2, 3, 4]); a.set_xlabel('enrollment samples $K$'); a.set_title('(c) Enrollment size'); a.legend()
     plt.tight_layout(); plt.savefig(f'{FIG}/severity.pdf'); plt.close()
 
 
 def f_dirfar():
     plt = _style()
     D = J('results/paper_analyses.json')['dirfar']
-    fig, ax = plt.subplots(1, 3, figsize=(11, 2.9), sharey=True)
+    fig, ax = plt.subplots(1, 3, figsize=(FULL, 2.1), sharey=True)
     for a, (m, t) in zip(ax, [('nm', 'NM probes'), ('cl', 'CL probes'), ('nm_occ', 'Occluded NM probes')]):
         for kind, lab in [('b1', 'B1'), ('head', 'B1 + head')]:
             fa, dr = D[kind][m]
-            a.plot(np.array(fa) * 100, np.array(dr) * 100, color=COL[kind], label=lab, lw=1.8)
+            a.plot(np.array(fa) * 100, np.array(dr) * 100, color=COL[kind], label=lab, lw=1.4)
         a.set_xscale('log'); a.set_xlabel('false alarm rate (%)'); a.set_title(t)
-    ax[0].set_ylabel('detection and identification rate (%)'); ax[0].legend(loc='upper left')
+    ax[0].set_ylabel('DIR (%)'); ax[0].legend(loc='upper left')
     plt.tight_layout(); plt.savefig(f'{FIG}/dirfar.pdf'); plt.close()
 
 
 def f_reliability():
     plt = _style()
     R = J('results/paper_analyses.json')['reliability']
-    fig, a = plt.subplots(1, 1, figsize=(3.6, 3.2))
+    fig, a = plt.subplots(1, 1, figsize=(HALF, 2.7))
     allv = []
     for s, r in R.items():
-        a.plot(r['pred'], r['obs'], marker='o', ms=3, color=COL['head'], alpha=0.6, lw=1)
+        a.plot(r['pred'], r['obs'], marker='o', ms=2.5, color=COL['head'], alpha=0.6, lw=0.9)
         allv += r['pred'] + r['obs']
     lo, hi = min(allv), max(allv)
     a.plot([lo, hi], [lo, hi], 'k:', lw=1, label='ideal')
@@ -251,15 +261,15 @@ def f_robustness_bars():
     keys = [('Corrupted enrollment', 'Corrupted\nenrollment'), ('Occluded probes: hband', 'Horizontal\nband$^\\dagger$'),
             ('Occluded probes: bottom', 'Lower\nbody'), ('Open-set occ_hband AUROC', 'Open-set\noccl. AUROC'),
             ('FG-CV mean', 'Clean\ncross-view')]
-    fig, a = plt.subplots(1, 1, figsize=(7.5, 2.9))
+    fig, a = plt.subplots(1, 1, figsize=(HALF, 2.5))
     w = 0.26
-    for j, (ds, lab, c) in enumerate([('casiab', 'CASIA-B', '#1f77b4'), ('casiae', 'CASIA-E', '#ff7f0e'), ('oumvlp', 'OU-MVLP', '#2ca02c')]):
+    for j, (ds, lab, c) in enumerate([('casiab', 'CASIA-B', INDIGO), ('casiae', 'CASIA-E', AMBER), ('oumvlp', 'OU-MVLP', FLAME)]):
         R = J(f'results/md_eval_{ds}.json')
         seeds = [s for s in R if 'b1' in R[s] and 'head' in R[s]]
         d = [[metrics(R[s]['head'])[k] - metrics(R[s]['b1'])[k] for s in seeds] for k, _ in keys]
         a.bar(np.arange(len(keys)) + (j - 1) * w, [np.mean(x) for x in d], w, yerr=[np.std(x) for x in d],
-              capsize=2, color=c, label=lab)
-    a.axhline(0, color='k', lw=0.8); a.set_xticks(np.arange(len(keys))); a.set_xticklabels([k[1] for k in keys])
+              capsize=1.2, color=c, label=lab, error_kw={'elinewidth': 0.6})
+    a.axhline(0, color='k', lw=0.6); a.set_xticks(np.arange(len(keys))); a.set_xticklabels([k[1] for k in keys], fontsize=5.8)
     a.set_ylabel('gain over B1 (points)'); a.legend(ncol=3, loc='upper right')
     plt.tight_layout(); plt.savefig(f'{FIG}/robustness_bars.pdf'); plt.close()
 
@@ -269,16 +279,19 @@ def f_heads_bars():
     rows = [('Proto', 'results/p3_bn'), ('Matching', 'results/p5_matching'), ('Relation', 'results/p5_relation'),
             ('Meta-B.', 'results/p5_metabase'), ('FEAT', 'results/p5_feat'), ('TADAM', 'results/p5_tadam'),
             ('B1', 'results/p3_bn_aux')]
-    fig, ax = plt.subplots(1, 2, figsize=(9, 2.8))
+    fig, ax = plt.subplots(1, 2, figsize=(FULL, 2.1))
     names = [r[0] for r in rows] + ['Ours']
     m = [J(f'{d}/summary.json')['evals']['full_gallery_cv'] for _, d in rows]
     ours = J('results/p4_2stage_occ/summary.json')['evals']['fgcv_n1n2_lam1']
     for a, key, t in [(ax[0], 'mean', 'Cross-view rank-1 (mean)'), (ax[1], 'cl', 'Cross-view rank-1 (CL)')]:
         vals = [x[key]['mean'] for x in m] + [ours[key]['mean']]
         errs = [x[key]['ci95'] for x in m] + [ours[key]['ci95']]
-        cols = ['#bbbbbb'] * (len(rows) - 1) + ['#7f7f7f', '#1f77b4']
-        a.bar(names, vals, yerr=errs, capsize=2, color=cols); a.set_title(t)
-        a.tick_params(axis='x', labelsize=8); a.set_ylim(min(vals) - 8, max(vals) + 4)
+        cols = [LAVENDER] * (len(rows) - 1) + [INDIGO, FLAME]
+        a.bar(names, vals, yerr=errs, capsize=1.5, color=cols, error_kw={'elinewidth': 0.6}); a.set_title(t)
+        a.set_ylim(min(vals) - 8, max(vals) + 4)
+        a.tick_params(axis='x', labelrotation=30)
+        for lab in a.get_xticklabels():
+            lab.set_ha('right')
     ax[0].set_ylabel('rank-1 (%)')
     plt.tight_layout(); plt.savefig(f'{FIG}/heads_bars.pdf'); plt.close()
 
@@ -287,13 +300,14 @@ def f_attention_bars():
     plt = _style()
     rows = [('Uniform', 'abl_cv_uniform'), ('Global', 'abl_cv_global'), ('Query', 'abl_cv_query'),
             ('[q; c̄]', 'abl_cv_concat'), ('Residual', 'v0_dppnet_lt_cv')]
-    fig, a = plt.subplots(1, 1, figsize=(4.6, 2.8))
+    fig, a = plt.subplots(1, 1, figsize=(HALF, 2.3))
     x = np.arange(len(rows)); w = 0.26
-    for j, (c, col) in enumerate([('nm', '#9ecae1'), ('bg', '#4292c6'), ('cl', '#08519c')]):
+    for j, (c, col) in enumerate([('nm', INDIGO), ('bg', PERIWINKLE), ('cl', AMBER)]):
         v = [J(f'results/{r}/summary.json')['evals']['full_gallery_cv'][c] for _, r in rows]
-        a.bar(x + (j - 1) * w, [z['mean'] for z in v], w, yerr=[z['ci95'] for z in v], capsize=2, color=col, label=c.upper())
-    a.set_xticks(x); a.set_xticklabels([r[0] for r in rows], fontsize=8); a.set_ylabel('cross-view rank-1 (%)')
-    a.legend(ncol=3, fontsize=7)
+        a.bar(x + (j - 1) * w, [z['mean'] for z in v], w, yerr=[z['ci95'] for z in v], capsize=1.2, color=col,
+              label=c.upper(), error_kw={'elinewidth': 0.6})
+    a.set_xticks(x); a.set_xticklabels([r[0] for r in rows]); a.set_ylabel('cross-view rank-1 (%)')
+    a.set_ylim(0, 84); a.legend(ncol=3, loc='upper center')
     plt.tight_layout(); plt.savefig(f'{FIG}/attention_bars.pdf'); plt.close()
 
 
@@ -303,27 +317,28 @@ def f_frozen_types():
     X = frozen_occ_types()
     types = [('clean', 'Clean'), ('hband', 'H. band$^\\dagger$'), ('bottom', 'Lower body'), ('vband', 'V. band'), ('noise', 'Noise')]
     bbs = [(bb, f'{n} (frozen)') for bb, n, _ in FROZEN_BBS if bb in X]
-    fig, ax = plt.subplots(2, 2, figsize=(9, 5.2), sharey=True)
-    ax = ax.ravel()
+    fig, ax = plt.subplots(1, len(bbs), figsize=(FULL, 2.2), sharey=True)
     for a, (bb, t) in zip(ax, bbs):
         fr = [np.mean([d['frozen'][k] for d in X[bb].values()]) for k, _ in types]
         hd = [np.mean([r[k] for d in X[bb].values() for r in d['head'].values()]) for k, _ in types]
         x = np.arange(len(types))
         a.bar(x - 0.2, fr, 0.4, color=COL['frozen'], label='frozen'); a.bar(x + 0.2, hd, 0.4, color=COL['head'], label='+ head')
-        a.set_xticks(x); a.set_xticklabels([t_[1] for t_ in types], fontsize=8); a.set_title(t)
-    ax[0].set_ylabel('rank-1 (%)'); ax[2].set_ylabel('rank-1 (%)'); ax[0].legend()
-    plt.tight_layout(); plt.savefig(f'{FIG}/frozen_types.pdf'); plt.close()
+        a.set_xticks(x); a.set_xticklabels([t_[1] for t_ in types], rotation=35, ha='right'); a.set_title(t)
+    ax[0].set_ylabel('rank-1 (%)')
+    h, l = ax[0].get_legend_handles_labels()
+    fig.legend(h, l, ncol=2, loc='upper center', bbox_to_anchor=(0.5, 1.0))
+    plt.tight_layout(rect=(0, 0, 1, 0.92)); plt.savefig(f'{FIG}/frozen_types.pdf'); plt.close()
 
 
 def f_baselines():
     """Robustness baselines vs the head and the hybrid, per dataset (results/robust_baselines_*.json)."""
     plt = _style()
-    kinds = [('b1', 'Mean (B1)', '#c7c7c7'), ('median', 'Median', '#a6a6a6'), ('energy', 'Energy mask', '#7f7f7f'),
-             ('head_global', 'Pooled var.', '#9ecae1'), ('head', 'Head (ours)', '#1f77b4'),
-             ('hybrid', 'Head + energy (ours)', '#08306b')]
+    kinds = [('b1', 'Mean (B1)', INDIGO), ('median', 'Median', PERIWINKLE), ('energy', 'Energy mask', LAVENDER),
+             ('head_global', 'Pooled var.', AMBER), ('head', 'Head (ours)', ORANGE),
+             ('hybrid', 'Head + energy (ours)', FLAME)]
     scen = [('corrupt_enroll', 'Corrupted\nenrollment'), ('occ_hband', 'Horizontal\nband$^\\dagger$'),
             ('occ_bottom', 'Lower\nbody')]
-    fig, ax = plt.subplots(1, 3, figsize=(11, 2.9))
+    fig, ax = plt.subplots(1, 3, figsize=(FULL, 2.3))
     w = 0.13
     for a, (ds, t) in zip(ax, [('casiab', 'CASIA-B'), ('casiae', 'CASIA-E'), ('oumvlp', 'OU-MVLP')]):
         R = J(f'results/robust_baselines_{ds}.json')
@@ -333,19 +348,106 @@ def f_baselines():
             v = [[np.mean([x[k] for c, x in R[s]['acc'].items() if c.split('>')[0] == s_]) for s in seeds]
                  for s_, _ in sc]
             a.bar(np.arange(len(sc)) + (j - 2.5) * w, [np.mean(x) for x in v], w, yerr=[np.std(x) for x in v],
-                  capsize=1.5, color=col, label=lab)
+                  capsize=1, color=col, label=lab, error_kw={'elinewidth': 0.5})
         a.set_xticks(np.arange(len(sc))); a.set_xticklabels([s[1] for s in sc]); a.set_title(t)
     ax[0].set_ylabel('rank-1 (%)')
     h, l = ax[0].get_legend_handles_labels()
-    fig.legend(h, l, ncol=6, loc='lower center', bbox_to_anchor=(0.5, -0.02), fontsize=8)
-    plt.tight_layout(rect=(0, 0.08, 1, 1)); plt.savefig(f'{FIG}/baselines.pdf'); plt.close()
+    fig.legend(h, l, ncol=6, loc='lower center', bbox_to_anchor=(0.5, -0.02))
+    plt.tight_layout(rect=(0, 0.09, 1, 1)); plt.savefig(f'{FIG}/baselines.pdf'); plt.close()
+
+
+PARTS = ['head', 'shoulders', 'upper torso', 'lower torso', 'pelvis', 'thighs', 'calves', 'feet']
+
+
+def _show_gei(a, img, up=8):
+    """GEI upsampled by pixel replication, so the embedded image stays sharp at any zoom in the PDF."""
+    a.imshow(np.kron(np.asarray(img, dtype=float), np.ones((up, up))), cmap='gray', vmin=0, vmax=float(np.max(img)) or 1,
+             interpolation='nearest', extent=(0, img.shape[1], img.shape[0], 0))
+
+
+def f_corruption_types():
+    """One CASIA-B test GEI under the four probe corruptions (occlusions.corrupt, as used in evaluation)."""
+    if not os.path.exists('data/cache/casiab_gei.npz'):
+        print('f_corruption_types: dataset caches not built (see README), skipped'); return
+    plt = _style()
+    from .data.casiab import CasiaB, SEQS, VIEWS as CV
+    from .occlusions import corrupt
+    ds = CasiaB('data/cache/casiab_gei.npz')
+    s, q, v = ds.lt_split(12)['test'][3], SEQS.index('nm-05'), CV.index('090')
+    x = ds.get(s, q, v)
+    kinds = [(None, 'Clean'), ('hband', 'Horizontal band$^\\dagger$'), ('bottom', 'Lower body'),
+             ('vband', 'Vertical band'), ('noise', 'Segmentation noise')]
+    fig, ax = plt.subplots(1, 5, figsize=(FULL, 1.75))
+    for a, (k, t) in zip(ax, kinds):
+        _show_gei(a, np.clip((x if k is None else corrupt(x, (s, q, v), k))[0], 0, 1))
+        a.set_title(t); a.axis('off')
+    plt.tight_layout(w_pad=0.4); plt.savefig(f'{FIG}/corruption_types.pdf'); plt.close()
+
+
+def f_uncertainty_examples(run='results/p4_2stage_occ'):
+    """Predicted per-part variance for one test subject (NM/BG/CL at 90 deg, seed 0) and the median CL/NM
+    variance ratio per part over the test set (uncertainty_validation.json of the same run)."""
+    if not os.path.exists('data/cache/casiab_gei.npz'):
+        print('f_uncertainty_examples: dataset caches not built (see README), skipped'); return
+    plt = _style()
+    import torch
+    from .data.casiab import CasiaB, SEQS, VIEWS as CV
+    from . import validate_uncertainty as vu
+    vu.RUN = run                                           # load() reads the head of this run
+    load = vu.load
+    ds = CasiaB('data/cache/casiab_gei.npz')
+    s, v = ds.lt_split(12)['test'][3], CV.index('090')
+    m = load(0, 'cpu')
+    summ = J(f'{run}/uncertainty_validation.json')['summary']
+    fig = plt.figure(figsize=(FULL, 3.0))
+    gs = fig.add_gridspec(2, 4, height_ratios=[1, 1.15], hspace=0.35, wspace=0.55)
+    for k, q in enumerate([0, 6, 8]):
+        with torch.no_grad():
+            _, var = m.embed(torch.from_numpy(ds.get(s, q, v))[None])
+        a = fig.add_subplot(gs[0, k])
+        _show_gei(a, ds.gei[s, q, v])
+        for r in range(1, 8):
+            a.axhline(8 * r, color=AMBER, lw=0.4)
+        a.set_title(f'{SEQS[q].upper()}, 90$^\\circ$'); a.axis('off')
+        b = fig.add_subplot(gs[1, k])
+        b.barh(range(8), var[0].numpy(), color=FLAME, height=0.7)
+        b.set_yticks(range(8)); b.set_yticklabels(PARTS if k == 0 else [''] * 8); b.invert_yaxis()
+        b.set_xlabel('predicted variance'); b.grid(axis='y', visible=False)
+    b = fig.add_subplot(gs[1, 3])
+    r = np.array([summ['ratio_cl_nm'][p]['mean'] for p in PARTS])
+    b.barh(range(8), r, color=INDIGO, height=0.7); b.axvline(1, color='k', lw=0.6)
+    b.set_yticks(range(8)); b.set_yticklabels([''] * 8); b.invert_yaxis()
+    b.set_xlabel('CL / NM ratio'); b.set_title('test set, 5 seeds'); b.grid(axis='y', visible=False)
+    fig.subplots_adjust(left=0.1, right=0.97, bottom=0.12, top=0.93)
+    plt.savefig(f'{FIG}/uncertainty_examples.pdf'); plt.close()
+
+
+def f_deletion_curves():
+    """Input-deletion flip curves for coat-wearing probes (results/p4d_interpret/summary.json, 5 seeds)."""
+    plt = _style()
+    S = J('results/p4d_interpret/summary.json')
+    orders = [('contrib', 'margin decomposition (most important first)', FLAME, '-', 'o'),
+              ('weight', 'weights (attention / inverse variance)', PERIWINKLE, '--', 's'),
+              ('random', 'random order', INDIGO, ':', None),
+              ('anti', 'least important first', AMBER, '-.', '^')]
+    models = [('attention', 'Attention baseline (L0)'), ('b1', 'B1 (uniform)'), ('n1n2', 'B1 + reliability head')]
+    fig, ax = plt.subplots(1, 3, figsize=(FULL, 2.2), sharey=True)
+    for a, (mk, t) in zip(ax, models):
+        C = S[mk]['cl']['flip_curves']
+        for e, lab, c, ls, mrk in orders:
+            a.plot(range(5), [0] + C[e], color=c, ls=ls, marker=mrk, ms=2.5, label=lab)
+        a.set_title(t); a.set_xlabel('parts blanked in the probe ($k$)'); a.set_xticks(range(5))
+    ax[0].set_ylabel('fraction of decisions flipped')
+    h, l = ax[0].get_legend_handles_labels()
+    fig.legend(h, l, ncol=4, loc='lower center', bbox_to_anchor=(0.5, -0.02))
+    plt.tight_layout(rect=(0, 0.1, 1, 1)); plt.savefig(f'{FIG}/deletion_curves.pdf'); plt.close()
 
 
 
 if __name__ == '__main__':
     os.makedirs(FIG, exist_ok=True)
     for f in [t_datasets, t_reproduction, t_static, f_robustness_bars, f_heads_bars, f_attention_bars, f_frozen_types,
-              f_baselines]:
+              f_baselines, f_corruption_types, f_uncertainty_examples, f_deletion_curves]:
         f(); print('ok', f.__name__)
     A = J('results/paper_analyses.json')
     if 'timing' in A:

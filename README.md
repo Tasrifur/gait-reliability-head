@@ -108,7 +108,7 @@ python -m gaitlab.latex_tables        # -> elsarticle/tables/*.tex
 python -m gaitlab.latex_tables_extra  # -> elsarticle/figs/*.pdf
 ```
 
-Only the dataset-statistics table needs the dataset caches; it is skipped if they have not been built. Without the caches, `pytest` likewise skips the sampler tests.
+Only the dataset-statistics table and the two figures that show silhouettes (probe corruptions, per-part variance) need the dataset caches; they are skipped if the caches have not been built. Figures are vector PDFs with embedded fonts, sized for a two-column layout. Without the caches, `pytest` likewise skips the sampler tests.
 
 ## Citation
 

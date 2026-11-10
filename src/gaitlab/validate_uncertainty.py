@@ -30,9 +30,9 @@ PARTS = ['head', 'shoulders', 'upper torso', 'lower torso', 'pelvis', 'thighs', 
 @torch.no_grad()
 def load(seed, device):
     m = ProbProtoNet('v0bn').to(device).eval()
-    b1 = torch.load(f'results/p3_bn_aux/seed{seed}/best.pt', weights_only=True)
+    b1 = torch.load(f'results/p3_bn_aux/seed{seed}/best.pt', map_location=device, weights_only=True)
     m.cnn.load_state_dict({k[4:]: v for k, v in b1.items() if k.startswith('cnn.')})
-    m.load_state_dict(torch.load(f'{RUN}/seed{seed}/var_head.pt', weights_only=True),
+    m.load_state_dict(torch.load(f'{RUN}/seed{seed}/var_head.pt', map_location=device, weights_only=True),
                       strict=False)
     return m
 
