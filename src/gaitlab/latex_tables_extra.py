@@ -528,6 +528,8 @@ def f_deletion_curves():
     for a, (mk, t) in zip(ax, models):
         C = S[mk]['cl']['flip_curves']
         for e, lab, c, ls, mrk in orders:
+            if e == 'weight' and mk == 'b1':
+                continue                                   # B1 weights all parts equally: no weight order (Table faith: --)
             a.plot(range(5), [0] + C[e], color=c, ls=ls, marker=mrk, ms=2.5, label=lab)
         a.set_title(t); a.set_xlabel('parts blanked in the probe ($k$)'); a.set_xticks(range(5))
     ax[0].set_ylabel('fraction of decisions flipped')
