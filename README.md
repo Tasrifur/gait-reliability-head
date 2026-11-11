@@ -1,6 +1,6 @@
 # Know Which Body Part to Trust: a plug-in per-part reliability head for gait recognition
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24126915.svg)](https://doi.org/10.5281/zenodo.24126915)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24126913.svg)](https://doi.org/10.5281/zenodo.24126913)
 
 Code, trained weights and result files for the paper
 
@@ -114,7 +114,7 @@ Only the dataset-statistics table and the two figures that show silhouettes (pro
 
 ## Citation
 
-If you use this code, please cite the paper (citation details will be added on publication). The software itself is archived on Zenodo: version 1.0.0, which accompanies the paper, is [10.5281/zenodo.24126915](https://doi.org/10.5281/zenodo.24126915), and [10.5281/zenodo.24126913](https://doi.org/10.5281/zenodo.24126913) always resolves to the latest version. Citation metadata for it are in `CITATION.cff`, which GitHub shows under "Cite this repository".
+If you use this code, please cite the paper (citation details will be added on publication). The software itself is archived on Zenodo: [10.5281/zenodo.24126913](https://doi.org/10.5281/zenodo.24126913) always resolves to the latest version, and each release has its own DOI listed on that page. Citation metadata for it are in `CITATION.cff`, which GitHub shows under "Cite this repository".
 
 ## License
 

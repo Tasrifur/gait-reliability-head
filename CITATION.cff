@@ -1,10 +1,10 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "gait-reliability-head: a plug-in per-part reliability head for gait recognition"
-version: 1.0.0
+version: 1.0.1
 date-released: 2026-11-11
 license: MIT
-doi: 10.5281/zenodo.24126915
+doi: 10.5281/zenodo.24126913
 repository-code: "https://github.com/Tasrifur/gait-reliability-head"
 authors:
   - family-names: Riahi
