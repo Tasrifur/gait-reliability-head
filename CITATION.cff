@@ -4,6 +4,7 @@ title: "gait-reliability-head: a plug-in per-part reliability head for gait reco
 version: 1.0.0
 date-released: 2026-11-11
 license: MIT
+doi: 10.5281/zenodo.24126915
 repository-code: "https://github.com/Tasrifur/gait-reliability-head"
 authors:
   - family-names: Riahi
