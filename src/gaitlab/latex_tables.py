@@ -71,7 +71,8 @@ def t_multidataset():
                 cells += ['--', '--', '--']
                 continue
             vb, vh = [x[key] for x in b], [x[key] for x in h]
-            cells += [f'{np.mean(vb):.2f}', f'{np.mean(vh):.2f}', delta(vb, vh)]
+            sd = lambda v: f'{np.mean(v):.2f}{{\\scriptsize$\\pm${np.std(v):.2f}}}'      # mean ± s.d. over seeds
+            cells += [sd(vb), sd(vh), delta(vb, vh)]
         L.append(f'{label} & ' + ' & '.join(cells) + ' \\\\')
         if label.startswith('Mismatched') or label.startswith('Occluded probes: segm'):
             L.append('\\midrule')
@@ -150,7 +151,8 @@ RELABEL = [('Original DPP-Net (residual attention)', 'Attention baseline (residu
            ('(model of record)', '(full model, ours)'),
            ('Model of record: B1 + N1/N2/N4 occ-aware (ours)', 'B1 + reliability head (ours)'),
            ('B1: Proto + per-strip aux (ours)', 'B1 (ours)'),
-           ('+ N1 per-strip uncertainty (two-stage)', '+ N1 per-part uncertainty'),
+           ('+ N1 per-strip uncertainty (two-stage)', '+ M1 per-part uncertainty'),
+           ('+ N2 precision-weighted prototypes', '+ M2 precision-weighted enrollment'),
            ('+ occlusion-aware uncertainty (full model, ours)', '+ occlusion-aware calibration (ours)')]
 
 

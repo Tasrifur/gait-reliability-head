@@ -167,12 +167,12 @@ T_GUIDANCE = r"""\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.33\columnw
 \toprule
 Operating condition & Component & Evidence \\
 \midrule
-Probes partly occluded & per-part likelihood (N1) & Tables~\ref{tab:multi}, \ref{tab:baselines} \\
-Enrollment walks partly occluded & precision-weighted enrollment (N2), $K>1$ & Fig.~\ref{fig:severity}, Remark~\ref{rem:reject} \\
+Probes partly occluded & per-part likelihood (M1) & Tables~\ref{tab:multi}, \ref{tab:baselines} \\
+Enrollment walks partly occluded & precision-weighted enrollment (M2), $K>1$ & Fig.~\ref{fig:severity}, Remark~\ref{rem:reject} \\
 Body regions leaving the field of view & silhouette-energy prior (Eq.~\ref{eq:hybrid}) & Table~\ref{tab:baselines} \\
 Frozen backbone, occlusion-heavy site & precision-weighted backbone distance (Eq.~\ref{eq:wdist}) & Table~\ref{tab:frozenscorers} \\
-Clothing and carrying covariates & per-part likelihood (N1) & Tables~\ref{tab:multi}, \ref{tab:frozen} \\
-Unknown walkers & likelihood-based rejection (N4) & Fig.~\ref{fig:dirfar}, Table~\ref{tab:frozen} \\
+Clothing and carrying covariates & per-part likelihood (M1) & Tables~\ref{tab:multi}, \ref{tab:frozen} \\
+Unknown walkers & likelihood-based rejection (M3) & Fig.~\ref{fig:dirfar}, Table~\ref{tab:frozen} \\
 Auditing a decision & margin decomposition (Eqs.~\ref{eq:margin}, \ref{eq:margin_split}) & Table~\ref{tab:faith} \\
 Existing deployed backbone & plug-in head, no retraining & Tables~\ref{tab:frozen}, \ref{tab:frozenscorers} \\
 \bottomrule
