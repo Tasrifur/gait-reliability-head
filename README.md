@@ -2,13 +2,13 @@
 
 Code, trained weights and result files for the paper
 
-> T. Riahi, H. A. Mustafa, *Know Which Body Part to Trust: A Plug-in Per-Part Reliability Head for Few-Shot Gait Recognition*.
+> T. Riahi, H. A. Mustafa, *Know Which Body Part to Trust: A Plug-in Per-Part Reliability Head for Robust Few-Shot Gait Enrollment and Rejection*.
 
 The reliability head attaches to any **frozen** part-based gait model. For every body part of every sample, it predicts a variance that says how far that part can be trusted. A single Gaussian likelihood then provides:
 
-- **N1 – reliability-aware matching.** Part weights depend on both the probe and the enrolled identity.
-- **N2 – precision-weighted enrollment.** Enrollment walks are fused part by part, so the occluded strip of one walk is discounted while its intact strips are kept. Enrollment is closed-form and incremental.
-- **N4 – rejection of unknown walkers.** The same likelihood gives an acceptance score for open-set operation.
+- **M1 – reliability-aware matching.** Part weights depend on both the probe and the enrolled identity.
+- **M2 – precision-weighted enrollment.** Enrollment walks are fused part by part, so the occluded strip of one walk is discounted while its intact strips are kept. Enrollment is closed-form and incremental.
+- **M3 – rejection of unknown walkers.** The same likelihood gives an acceptance score for open-set operation.
 - **Exact explanations.** Every decision margin decomposes into per-part contributions.
 
 The head has about 16k parameters. It is calibrated in a second stage on a small set of identities the backbone has never seen.
@@ -18,7 +18,7 @@ The head has about 16k parameters. It is calibrated in a second stage on a small
 | Path | Content |
 |---|---|
 | `src/gaitlab/` | all code (Python package; run modules with `PYTHONPATH=src`) |
-| `src/gaitlab/models/` | B1 GEI backbone (`protonet.py`), reliability head and N1/N2 (`probnet.py`), six few-shot heads (`heads.py`), attention baseline (`dppnet.py`) |
+| `src/gaitlab/models/` | B1 GEI backbone (`protonet.py`), reliability head, M1 matching and M2 enrollment (`probnet.py`), six few-shot heads (`heads.py`), attention baseline (`dppnet.py`) |
 | `src/gaitlab/data/` | dataset caches, episodic sampler, CASIA-E / OU-MVLP dense loaders |
 | `configs/` | YAML configs of every training run |
 | `tests/` | unit tests for the protocols and the probabilistic model |
@@ -112,7 +112,7 @@ Only the dataset-statistics table and the two figures that show silhouettes (pro
 
 ## Citation
 
-If you use this code, please cite the paper (citation details will be added on publication).
+If you use this code, please cite the paper (citation details will be added on publication). The software itself is archived on Zenodo; citation metadata for it are in `CITATION.cff`, which GitHub shows under "Cite this repository".
 
 ## License
 

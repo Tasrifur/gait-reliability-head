@@ -1,0 +1,12 @@
+{
+  "title": "gait-reliability-head: code, weights and results for \"Know Which Body Part to Trust: A Plug-in Per-Part Reliability Head for Robust Few-Shot Gait Enrollment and Rejection\"",
+  "upload_type": "software",
+  "description": "<p>Code, trained weights and per-run result files for a plug-in per-part reliability head for frozen part-based gait recognition models. For every body part of every sample, the head predicts a variance; a single Gaussian likelihood then provides reliability-aware matching, precision-weighted enrollment, rejection of unknown walkers and an exact per-part decomposition of every decision. The archive includes the evaluation scripts for CASIA-B, CASIA-E and OU-MVLP and for four frozen OpenGait checkpoints (GaitSet, GaitPart, GaitGL, GaitBase), and the generators of every table and figure of the paper. The datasets and OpenGait checkpoints are not redistributed.</p>",
+  "creators": [
+    {"name": "Riahi, Tasrifur", "affiliation": "Institute of Information and Communication Technology, Bangladesh University of Engineering and Technology"},
+    {"name": "Mustafa, Hossen A", "affiliation": "Institute of Information and Communication Technology, Bangladesh University of Engineering and Technology"}
+  ],
+  "keywords": ["gait recognition", "few-shot enrollment", "uncertainty estimation", "occlusion robustness", "open-set recognition", "explainable biometrics"],
+  "license": "MIT",
+  "access_right": "open"
+}

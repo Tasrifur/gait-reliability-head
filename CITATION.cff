@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "gait-reliability-head: a plug-in per-part reliability head for gait recognition"
+version: 1.0.0
+date-released: 2026-11-11
+license: MIT
+repository-code: "https://github.com/Tasrifur/gait-reliability-head"
+authors:
+  - family-names: Riahi
+    given-names: Tasrifur
+    affiliation: "Institute of Information and Communication Technology, Bangladesh University of Engineering and Technology"
+  - family-names: Mustafa
+    given-names: Hossen A
+    affiliation: "Institute of Information and Communication Technology, Bangladesh University of Engineering and Technology"
+keywords:
+  - gait recognition
+  - few-shot enrollment
+  - uncertainty estimation
+  - occlusion robustness
+  - open-set recognition
