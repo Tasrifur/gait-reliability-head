@@ -1,4 +1,4 @@
-"""Additional manuscript tables and figures (v3 polish), generated from saved results.
+"""Additional result tables and figures, generated from the saved result files.
 
 Tables -> elsarticle/tables/, figures -> elsarticle/figs/.
 Usage: python -m gaitlab.latex_tables_extra
@@ -50,10 +50,10 @@ def t_datasets():
 def t_reproduction():
     R = J('results/p5_frozen/results.json')
     R.update(J('results/p5_frozen/repro.json'))             # GaitPart, GaitGL (frozen_hybrid repro)
-    pub = {'gaitset': (r'GaitSet~\cite{chao2019gaitset}', (95.8, 90.0, 75.4)),
-           'gaitpart': (r'GaitPart~\cite{fan2020gaitpart}', (96.1, 90.7, 78.7)),
-           'gaitgl': (r'GaitGL~\cite{lin2021gaitgl}', (97.4, 94.5, 83.8)),
-           'gaitbase': (r'GaitBase~\cite{fan2023opengait}', (97.6, 94.0, 77.4))}
+    pub = {'gaitset': ('GaitSet', (95.8, 90.0, 75.4)),
+           'gaitpart': ('GaitPart', (96.1, 90.7, 78.7)),
+           'gaitgl': ('GaitGL', (97.4, 94.5, 83.8)),
+           'gaitbase': ('GaitBase', (97.6, 94.0, 77.4))}
     L = [r'\begin{tabular}{lcccccc}', r'\toprule',
          r' & \multicolumn{3}{c}{Published (OpenGait)} & \multicolumn{3}{c}{Our evaluation} \\',
          r'\cmidrule(lr){2-4}\cmidrule(lr){5-7}', r'Model & NM & BG & CL & NM & BG & CL \\', r'\midrule']
@@ -77,114 +77,6 @@ def t_complexity():
           r'Head on GaitSet, GaitBase & +16.5k & \multicolumn{2}{c}{$<$1\% of backbone} \\',
           r'\bottomrule', r'\end{tabular}']
     write('t_complexity', '\n'.join(L) + '\n')
-
-
-T_NOTATION = r"""\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.66\columnwidth}@{}}
-\toprule
-Symbol & Meaning \\
-\midrule
-$x$, $q$ & input sample (sequence or GEI); probe \\
-$P$, $D$ & number of parts; embedding dimension \\
-$\boldsymbol{\mu}_i(x)\in\mathbb{R}^D$ & frozen embedding of part $i$ of $x$ \\
-$s_i(x)>0$ & predicted variance of part $i$ of $x$ \\
-$h_\phi$ & reliability head with parameters $\phi$ \\
-$\mathcal{E}_n=\{x_{n,k}\}_{k=1}^{K}$ & enrollment set of identity $n$ \\
-$\boldsymbol{c}_{n,i}$, $s_i(c_n)$ & prototype mean and variance of part $i$ \\
-$\ell(q,c_n)$, $\ell_i(q,c_n)$ & log-likelihood; its part-$i$ term \\
-$\omega_i(q,c_n)$ & effective weight $1/(s_i(q)+s_i(c_n))$ \\
-$\Delta_i(q)$ & contribution of part $i$ to the margin \\
-$\mathcal{C}$, $\mathcal{G}$ & calibration identities; enrolled gallery \\
-$\tau$ & open-set acceptance threshold \\
-\bottomrule
-\end{tabular}
-"""
-
-T_HPARAMS = r"""\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.6\columnwidth}@{}}
-\toprule
-Hyperparameter & Value \\
-\midrule
-\multicolumn{2}{@{}l}{\textit{Compact backbone (B1)}} \\
-\quad architecture & 3 conv.\ blocks (32/64/128 ch.) with BN; $P=8$, $D=128$ \\
-\quad episodes & 20-way, 4-shot, 5 queries, cross-view, $\leq$8{,}000 \\
-\quad optimiser & Adam, lr $10^{-3}$, wd $10^{-5}$, cosine schedule, clip 1.0 \\
-\quad auxiliary loss weight & 1.0 (per part) \\
-\quad early stopping & every 200 episodes, patience 12 \\
-\midrule
-\multicolumn{2}{@{}l}{\textit{Reliability head}} \\
-\quad architecture & MLP $2D\!\to\!64\!\to\!1$, shared, + per-part bias \\
-\quad variance & softplus, floor $10^{-3}$, initial value 4 \\
-\quad calibration & 3{,}000 episodes, $N=\min(20,|\mathcal{C}|-2)$, $K=4$, 5 probes \\
-\quad optimiser & Adam, lr $10^{-3}$ \\
-\quad occlusion sampling & horizontal band, 6--16 rows, $p=0.5$ \\
-\midrule
-\multicolumn{2}{@{}l}{\textit{Evaluation}} \\
-\quad seeds & 5 (CASIA-B), 3 (CASIA-E, OU-MVLP) \\
-\quad open-set splits & 10 / 5 / 2; half of the test identities enrolled \\
-\bottomrule
-\end{tabular}
-"""
-
-# Representative related work (Table 1). Every entry was checked against the publisher record (Crossref / DOI)
-# and the paper's abstract or full text; attributes follow what the papers state.
-T_LITERATURE = r"""\begin{tabular}{@{}llllccccc@{}}
-\toprule
-Method & Venue & Year & Input & \begin{tabular}[b]{@{}c@{}}Frozen\\backbone\end{tabular} & Occlusion & Reliability & \begin{tabular}[b]{@{}c@{}}Open-set\\rejection\end{tabular} & Explanation \\
-\midrule
-\multicolumn{9}{@{}l}{\textit{Gait recognition models}} \\
-GaitGL~\cite{lin2021gaitgl} & ICCV & 2021 & silh. & -- & -- & -- & -- & -- \\
-GaitBase~\cite{fan2023opengait} & CVPR & 2023 & silh. & -- & -- & -- & -- & -- \\
-ParsingGait~\cite{zheng2023parsing} & ACM MM & 2023 & parsing & -- & $\circ$ & -- & -- & -- \\
-SkeletonGait~\cite{fan2024skeletongait} & AAAI & 2024 & skeleton & -- & $\circ$ & -- & -- & -- \\
-BigGait~\cite{ye2024biggait} & CVPR & 2024 & RGB & $\circ$ & -- & -- & -- & $\circ$ \\
-VPNet~\cite{ma2024visualprompt} & CVPR & 2024 & silh. & -- & $\circ$ & -- & -- & $\circ$ \\
-XGait~\cite{zheng2024xgait} & ACM MM & 2024 & silh.\ + parsing & -- & $\circ$ & -- & -- & $\circ$ \\
-\midrule
-\multicolumn{9}{@{}l}{\textit{Quality and uncertainty}} \\
-PFE~\cite{shi2019pfe} & ICCV & 2019 & face & \checkmark & -- & per sample & -- & -- \\
-PUCNN~\cite{sun2021pucnn} & ICIP & 2021 & person image & -- & -- & per part & -- & -- \\
-UAL~\cite{dou2022ual} & ECCV & 2022 & person image & -- & -- & per sample & \checkmark & -- \\
-GQAN~\cite{hou2023gqan} & TNNLS & 2023 & silh. & -- & -- & part quality & -- & \checkmark \\
-QAGait~\cite{wang2024qagait} & AAAI & 2024 & silh. & -- & -- & sequence quality & -- & -- \\
-\midrule
-\multicolumn{9}{@{}l}{\textit{Occlusion-robust gait recognition}} \\
-Occlusion-type aware~\cite{gupta2024occlusion} & WACV & 2024 & video & -- & \checkmark & -- & -- & -- \\
-GaitMoE~\cite{huang2024gaitmoe} & ECCV & 2024 & silh. & -- & \checkmark & -- & -- & $\circ$ \\
-BGaitR-Net~\cite{kumar2024bgaitr} & ESWA & 2024 & silh. & -- & \checkmark & -- & -- & -- \\
-ODR~\cite{hasan2024odr} & IEEE Access & 2024 & silh. & -- & \checkmark & -- & -- & -- \\
-RG-Gait~\cite{gupta2025mindgap} & IJCB & 2025 & silh. & -- & \checkmark & occlusion score & -- & -- \\
-\midrule
-\multicolumn{9}{@{}l}{\textit{Open-set operation}} \\
-Open-set losses~\cite{su2025openset} & ECCV & 2024 & face, gait, body & -- & -- & -- & \checkmark & -- \\
-SetTransformer enrollment~\cite{basoc2025enrollment} & FG & 2026 & skeleton & \checkmark & -- & -- & \checkmark & -- \\
-\midrule
-\textbf{Ours} & & & silh., GEI & \checkmark & \checkmark & per part, pair-dependent & \checkmark & \checkmark \\
-\bottomrule
-\end{tabular}
-"""
-
-
-T_GUIDANCE = r"""\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.33\columnwidth}>{\raggedright\arraybackslash}p{0.4\columnwidth}>{\raggedright\arraybackslash}p{0.21\columnwidth}@{}}
-\toprule
-Operating condition & Component & Evidence \\
-\midrule
-Probes partly occluded & per-part likelihood (M1) & Tables~\ref{tab:multi}, \ref{tab:baselines} \\
-Enrollment walks partly occluded & precision-weighted enrollment (M2), $K>1$ & Fig.~\ref{fig:severity}, Remark~\ref{rem:reject} \\
-Body regions leaving the field of view & silhouette-energy prior (Eq.~\ref{eq:hybrid}) & Table~\ref{tab:baselines} \\
-Frozen backbone, occlusion-heavy site & precision-weighted backbone distance (Eq.~\ref{eq:wdist}) & Table~\ref{tab:frozenscorers} \\
-Clothing and carrying covariates & per-part likelihood (M1) & Tables~\ref{tab:multi}, \ref{tab:frozen} \\
-Unknown walkers & likelihood-based rejection (M3) & Fig.~\ref{fig:dirfar}, Table~\ref{tab:frozen} \\
-Auditing a decision & margin decomposition (Eqs.~\ref{eq:margin}, \ref{eq:margin_split}) & Table~\ref{tab:faith} \\
-Existing deployed backbone & plug-in head, no retraining & Tables~\ref{tab:frozen}, \ref{tab:frozenscorers} \\
-\bottomrule
-\end{tabular}
-"""
-
-
-def t_static():
-    write('t_guidance', T_GUIDANCE)
-    write('t_notation', T_NOTATION)
-    write('t_hparams', T_HPARAMS)
-    write('t_literature', T_LITERATURE)
 
 
 # ------------------------------------------------------------------ figures
@@ -541,7 +433,7 @@ def f_deletion_curves():
 
 if __name__ == '__main__':
     os.makedirs(FIG, exist_ok=True)
-    for f in [t_datasets, t_reproduction, t_static, f_robustness_bars, f_heads_bars, f_attention_bars, f_frozen_types,
+    for f in [t_datasets, t_reproduction, f_robustness_bars, f_heads_bars, f_attention_bars, f_frozen_types,
               f_baselines, f_corruption_types, f_overview_thumbs, f_uncertainty_examples, f_deletion_curves]:
         f(); print('ok', f.__name__)
     A = J('results/paper_analyses.json')

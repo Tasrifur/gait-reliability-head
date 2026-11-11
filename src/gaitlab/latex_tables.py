@@ -1,4 +1,4 @@
-"""Generate the manuscript's LaTeX tables directly from saved result JSON files.
+"""Generate LaTeX result tables directly from the saved result JSON files.
 
 Writes elsarticle/tables/*.tex. Every number in the tables comes from results/.
 Usage: python -m gaitlab.latex_tables

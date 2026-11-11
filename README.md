@@ -103,11 +103,11 @@ python -m gaitlab.frozen_wdist gaitset           # precision-weighted backbone d
 
 Replace `gaitset` with `gaitpart`, `gaitgl` or `gaitbase`. `scripts/run_frozen_hybrid.ps1` (Windows) and `scripts/run_frozen_extra.sh` (Linux) run these steps for several backbones and resume after an interruption. On a GPU a backbone takes minutes; on a CPU, several hours.
 
-**Tables and figures.** Every number in the paper is generated from the JSON files in `results/`:
+**Result tables and figures.** All result tables and figures are generated from the JSON files in `results/`:
 
 ```bash
-python -m gaitlab.latex_tables        # -> elsarticle/tables/*.tex
-python -m gaitlab.latex_tables_extra  # -> elsarticle/figs/*.pdf
+python -m gaitlab.latex_tables        # LaTeX result tables -> elsarticle/tables/*.tex
+python -m gaitlab.latex_tables_extra  # further result tables and figures -> elsarticle/tables/, elsarticle/figs/
 ```
 
 Only the dataset-statistics table and the two figures that show silhouettes (probe corruptions, per-part variance) need the dataset caches; they are skipped if the caches have not been built. Figures are vector PDFs with embedded fonts, sized for a two-column layout. Without the caches, `pytest` likewise skips the sampler tests.
